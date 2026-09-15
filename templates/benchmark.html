@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Benchmarks</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container benchmark-page">
+        <header>
+            <h1>System Benchmarks</h1>
+            <a href="/" class="back-link">← Back to Search</a>
+        </header>
+        
+        <div id="benchmarkContent" class="benchmark-content">
+            <div class="loading">Running benchmarks... (this may take a few seconds)</div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', runBenchmarks);
+
+        async function runBenchmarks() {
+            const content = document.getElementById('benchmarkContent');
+            try {
+                const response = await fetch('/api/run_benchmark');
+                const data = await response.json();
+                
+                let buildTimeRows = data.build_times.map(b => 
+                    `<tr><td>${b.size}</td><td>${b.time_ms} ms</td></tr>`
+                ).join('');
+
+                content.innerHTML = `
+                    <section class="benchmark-section">
+                        <h2>1. Index Build Time Scaling</h2>
+                        <p>Time to build the inverted index as corpus size grows, demonstrating sub-linear query scaling.</p>
+                        <table class="benchmark-table">
+                            <thead>
+                                <tr><th>Corpus Size (Docs)</th><th>Build Time (ms)</th></tr>
+                            </thead>
+                            <tbody>
+                                ${buildTimeRows}
+                            </tbody>
+                        </table>
+                    </section>
+
+                    <section class="benchmark-section">
+                        <h2>2. Query Latency Comparison</h2>
+                        <p>Average query time: Inverted Index vs Naive Linear Scan.</p>
+                        <table class="benchmark-table">
+                            <thead>
+                                <tr><th>Method</th><th>Latency per Query (ms)</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>Inverted Index</td><td>${data.indexed_latency_ms} ms</td></tr>
+                                <tr><td>Naive Linear Scan</td><td>${data.naive_latency_ms} ms</td></tr>
+                            </tbody>
+                        </table>
+                    </section>
+
+                    <section class="benchmark-section">
+                        <h2>3. Fuzzy Match Accuracy</h2>
+                        <p>Percentage of test queries with deliberate typos correctly resolved to the target vocabulary word.</p>
+                        <div class="stat-box">
+                            <span class="stat-value">${data.fuzzy_accuracy_pct}%</span>
+                            <span class="stat-label">Accuracy</span>
+                        </div>
+                    </section>
+                `;
+            } catch (error) {
+                content.innerHTML = '<div class="error">Failed to run benchmarks.</div>';
+            }
+        }
+    </script>
+</body>
+</html>

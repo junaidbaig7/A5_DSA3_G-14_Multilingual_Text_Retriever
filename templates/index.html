@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multilingual Text Retrieval</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Multilingual Search</h1>
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Search in English, Spanish, or Hindi..." autofocus>
+                <select id="langFilter">
+                    <option value="all">All</option>
+                    <option value="en">EN</option>
+                    <option value="es">ES</option>
+                    <option value="hi">HI</option>
+                </select>
+                <button onclick="performSearch()">Search</button>
+                <button onclick="performSearch(true)" class="secondary-btn">Browse All</button>
+            </div>
+            <div class="meta-info">
+                <span id="latency" class="latency"></span>
+                <a href="/benchmark" class="benchmark-link">View Benchmarks</a>
+            </div>
+            <div id="correction" class="correction-note" style="display: none;"></div>
+        </header>
+        
+        <main id="resultsContainer">
+            <!-- Results will be injected here -->
+        </main>
+    </div>
+
+    <script>
+        document.getElementById('searchInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                performSearch();
+            }
+        });
+
+        async function performSearch(isBrowse = false) {
+            let query = document.getElementById('searchInput').value.trim();
+            if (isBrowse) {
+                query = '';
+                document.getElementById('searchInput').value = '';
+            } else if (!query) {
+                return;
+            }
+
+            const lang = document.getElementById('langFilter').value;
+            const resultsContainer = document.getElementById('resultsContainer');
+            const latencySpan = document.getElementById('latency');
+            const correctionDiv = document.getElementById('correction');
+            
+            resultsContainer.innerHTML = '<div class="loading">Searching...</div>';
+            latencySpan.textContent = '';
+            correctionDiv.style.display = 'none';
+
+            try {
+                const response = await fetch(`/search?q=${encodeURIComponent(query)}&lang=${lang}`);
+                const data = await response.json();
+                
+                latencySpan.textContent = `Query latency: ${data.latency} ms`;
+                
+                if (data.corrected_query) {
+                    correctionDiv.textContent = `Showing results for: ${data.corrected_query}`;
+                    correctionDiv.style.display = 'block';
+                }
+
+                if (data.results.length === 0) {
+                    resultsContainer.innerHTML = '<div class="no-results">No results found.</div>';
+                    return;
+                }
+
+                resultsContainer.innerHTML = data.results.map(result => `
+                    <div class="result-item">
+                        <div class="result-header">
+                            <h3 class="result-title">${result.title}</h3>
+                            <span class="lang-tag">${result.lang.toUpperCase()}</span>
+                        </div>
+                        <p class="result-snippet">${result.snippet}</p>
+                        <div class="result-score">Relevance Score: ${result.score}</div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                resultsContainer.innerHTML = '<div class="error">An error occurred during search.</div>';
+            }
+        }
+    </script>
+</body>
+</html>
