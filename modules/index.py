@@ -22,7 +22,8 @@ class InvertedIndex:
         metadata['text'] = text
         self.documents[doc_id] = metadata
         
-        tokens = tokenize(text)
+        full_content = f"{metadata.get('title', '')} {text}".strip()
+        tokens = tokenize(full_content)
         self.doc_lengths[doc_id] = len(tokens)
         
         # Count term frequencies in this document

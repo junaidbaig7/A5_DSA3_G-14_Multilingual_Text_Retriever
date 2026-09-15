@@ -9,19 +9,30 @@
 <body>
     <div class="container">
         <header>
-            <h1>Multilingual Search</h1>
-            <div class="search-box">
-                <input type="text" id="searchInput" placeholder="Search in English, Spanish, or Hindi..." autofocus>
-                <select id="langFilter">
-                    <option value="all">All</option>
-                    <option value="en">EN</option>
-                    <option value="es">ES</option>
-                    <option value="hi">HI</option>
-                </select>
-                <button onclick="performSearch()">Search</button>
-                <button onclick="performSearch(true)" class="secondary-btn">Browse All</button>
+            <div class="hero-section">
+                <h1>Multilingual Text Retriever</h1>
+                <p class="tagline">A classical DSA-powered search engine for English, Spanish, and Hindi.</p>
             </div>
-            <div class="meta-info">
+            <div class="search-top-row">
+                <div class="search-input-wrapper">
+                    <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#7a7a85" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                    <input type="text" id="searchInput" placeholder="pen" autofocus>
+                </div>
+                <button class="search-btn" onclick="performSearch()">Search</button>
+            </div>
+            <div class="search-bottom-row">
+                <select id="langFilter" class="custom-select">
+                    <option value="all">Language: All ▼</option>
+                    <option value="en">Language: EN</option>
+                    <option value="es">Language: ES</option>
+                    <option value="hi">Language: HI</option>
+                </select>
+                <button onclick="performSearch(true)" class="browse-btn">Browse All</button>
+            </div>
+            <div class="meta-info" style="display: none;">
                 <span id="latency" class="latency"></span>
                 <a href="/benchmark" class="benchmark-link">View Benchmarks</a>
             </div>
@@ -76,12 +87,13 @@
 
                 resultsContainer.innerHTML = data.results.map(result => `
                     <div class="result-item">
-                        <div class="result-header">
-                            <h3 class="result-title">${result.title}</h3>
-                            <span class="lang-tag">${result.lang.toUpperCase()}</span>
+                        <div class="lang-tag-wrapper">
+                            <span class="lang-tag lang-${result.lang.toLowerCase()}">${result.lang.toUpperCase()}</span>
                         </div>
-                        <p class="result-snippet">${result.snippet}</p>
-                        <div class="result-score">Relevance Score: ${result.score}</div>
+                        <div class="result-content">
+                            <h3 class="result-title">${result.title}</h3>
+                            <p class="result-snippet">${result.snippet}</p>
+                        </div>
                     </div>
                 `).join('');
             } catch (error) {
