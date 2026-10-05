@@ -1,44 +1,662 @@
 [
-  {"id": "1", "title": "The Ultimate Chocolate Chip Cookie Recipe", "lang": "en", "text": "A guide to baking the best cookies with butter, sugar, and chocolate."},
-  {"id": "2", "title": "How to Travel Europe on a Budget", "lang": "en", "text": "Tips for backpacking, hostels, and cheap flights across Paris and Rome."},
-  {"id": "3", "title": "The Future of Artificial Intelligence", "lang": "en", "text": "AI and machine learning are revolutionizing technology and software engineering."},
-  {"id": "4", "title": "Easy Pasta Primavera", "lang": "en", "text": "A quick Italian dish with fresh vegetables, olive oil, and garlic."},
-  {"id": "5", "title": "Top 10 Gadgets of 2024", "lang": "en", "text": "Smartphones, smartwatches, and the newest tech trends you need to know."},
-  {"id": "6", "title": "Solo Travel in Japan", "lang": "en", "text": "Navigating Tokyo, eating sushi, and finding zen in Kyoto."},
-  {"id": "7", "title": "Receta de Paella Valenciana", "lang": "es", "text": "Cómo preparar la auténtica paella española con arroz, pollo, conejo y azafrán."},
-  {"id": "8", "title": "Viajar por Sudamérica", "lang": "es", "text": "Consejos para mochileros en Perú, Argentina y Colombia."},
-  {"id": "9", "title": "Innovaciones Tecnológicas en España", "lang": "es", "text": "El crecimiento de las startups y la inteligencia artificial en Madrid."},
-  {"id": "10", "title": "Tacos al Pastor Caseros", "lang": "es", "text": "Una receta deliciosa de la cocina mexicana con cerdo, piña y cilantro."},
-  {"id": "11", "title": "Los Mejores Teléfonos Inteligentes", "lang": "es", "text": "Una revisión de la tecnología móvil actual y tendencias de smartphones."},
-  {"id": "12", "title": "Guía de Viaje a la Patagonia", "lang": "es", "text": "Descubriendo los glaciares y montañas del sur de Argentina y Chile."},
-  {"id": "13", "title": "मटर पनीर रेसिपी", "lang": "hi", "text": "घर पर स्वादिष्ट उत्तर भारतीय स्टाइल मटर पनीर कैसे बनाएं।"},
-  {"id": "14", "title": "भारत में सोलो ट्रैवल", "lang": "hi", "text": "राजस्थान के किलों से लेकर केरल के बैकवाटर्स तक की यात्रा।"},
-  {"id": "15", "title": "कृत्रिम बुद्धिमत्ता का भविष्य", "lang": "hi", "text": "कैसे एआई तकनीक और मशीन लर्निंग दुनिया को बदल रहे हैं।"},
-  {"id": "16", "title": "चिकन बिरयानी बनाने की विधि", "lang": "hi", "text": "मसालेदार और खुशबूदार हैदराबादी बिरयानी।"},
-  {"id": "17", "title": "लेटेस्ट स्मार्टफोन गैजेट्स", "lang": "hi", "text": "2024 के नए मोबाइल फोन और तकनीकी रुझान।"},
-  {"id": "18", "title": "हिमालय की यात्रा", "lang": "hi", "text": "लेह-लद्दाख में ट्रेकिंग और खूबसूरत वादियों का अनुभव।"},
-  {"id": "19", "title": "The Importance of a Good Pen", "lang": "en", "text": "Why writing with a fountain pen or a high-quality ballpoint pen improves your handwriting and paper notes."},
-  {"id": "20", "title": "Back to School Supplies", "lang": "en", "text": "A checklist including a book, notebooks, pencils, erasers, and a reliable blue pen."},
-  {"id": "21", "title": "Minimalist Workspace", "lang": "en", "text": "Keep your desk clean with just a laptop, a notebook, and a single pen on the table."},
-  {"id": "22", "title": "Coffee and Books", "lang": "en", "text": "The perfect morning routine involves reading a good book with a hot cup of coffee by the window."},
-  {"id": "23", "title": "How to Drive a Manual Car", "lang": "en", "text": "A beginner's guide to the clutch, gears, steering wheel, and driving on the road."},
-  {"id": "24", "title": "Basic House Cleaning Tips", "lang": "en", "text": "Sweeping the floor, washing windows with water, and organizing your room with a box."},
-  {"id": "25", "title": "A Guide to Men's Fashion", "lang": "en", "text": "Essential wardrobe items like a white shirt, blue jeans, a red jacket, and black leather shoes."},
-  {"id": "26", "title": "Pets at Home", "lang": "en", "text": "Choosing between a dog or a cat as your primary pet in a small apartment."},
-  {"id": "27", "title": "La Importancia de un Buen Bolígrafo", "lang": "es", "text": "Por qué escribir con una pluma estilográfica o un buen bolígrafo (pen) mejora tu caligrafía en papel."},
-  {"id": "28", "title": "Material Escolar", "lang": "es", "text": "Una lista que incluye un libro, cuadernos, lápices, gomas de borrar y un bolígrafo azul confiable."},
-  {"id": "29", "title": "Espacio de Trabajo Minimalista", "lang": "es", "text": "Mantén tu escritorio limpio con solo una computadora portátil, un cuaderno y un bolígrafo en la mesa."},
-  {"id": "30", "title": "Café y Libros", "lang": "es", "text": "La rutina matutina perfecta incluye leer un buen libro con una taza de café caliente junto a la ventana."},
-  {"id": "31", "title": "Cómo Conducir un Coche Manual", "lang": "es", "text": "Una guía para principiantes sobre el embrague, las marchas, el volante y conducir en la carretera."},
-  {"id": "32", "title": "Consejos Básicos de Limpieza del Hogar", "lang": "es", "text": "Barrer el suelo, lavar las ventanas con agua y organizar tu habitación con una caja."},
-  {"id": "33", "title": "Guía de Moda Masculina", "lang": "es", "text": "Artículos esenciales de vestuario como una camisa blanca, jeans azules, una chaqueta roja y zapatos de cuero negro."},
-  {"id": "34", "title": "Mascotas en Casa", "lang": "es", "text": "Elegir entre un perro o un gato como mascota principal en un apartamento pequeño."},
-  {"id": "35", "title": "एक अच्छे पेन का महत्व", "lang": "hi", "text": "क्यों एक फाउंटेन पेन या अच्छी गुणवत्ता वाले पेन से कागज पर लिखने से आपकी लिखावट में सुधार होता है।"},
-  {"id": "36", "title": "स्कूल की सामग्री", "lang": "hi", "text": "एक चेकलिस्ट जिसमें एक किताब, नोटबुक, पेंसिल, इरेज़र और एक विश्वसनीय नीला पेन शामिल है।"},
-  {"id": "37", "title": "मिनिमलिस्ट वर्कस्पेस", "lang": "hi", "text": "टेबल पर केवल एक लैपटॉप, एक नोटबुक और एक पेन के साथ अपने डेस्क को साफ रखें।"},
-  {"id": "38", "title": "कॉफी और किताबें", "lang": "hi", "text": "एक सही सुबह की दिनचर्या में खिड़की के पास एक कप गर्म कॉफी के साथ एक अच्छी किताब पढ़ना शामिल है।"},
-  {"id": "39", "title": "मैनुअल कार कैसे चलाएं", "lang": "hi", "text": "क्लच, गियर, स्टीयरिंग व्हील और सड़क पर ड्राइविंग के लिए एक शुरुआती मार्गदर्शिका।"},
-  {"id": "40", "title": "घर की सफाई के बुनियादी टिप्स", "lang": "hi", "text": "फर्श पर झाड़ू लगाना, खिड़कियों को पानी से धोना और एक बॉक्स के साथ अपने कमरे को व्यवस्थित करना।"},
-  {"id": "41", "title": "पुरुषों के फैशन के लिए एक गाइड", "lang": "hi", "text": "एक सफेद शर्ट, नीली जींस, एक लाल जैकेट और काले चमड़े के जूते जैसी आवश्यक अलमारी की वस्तुएं।"},
-  {"id": "42", "title": "घर पर पालतू जानवर", "lang": "hi", "text": "एक छोटे से अपार्टमेंट में अपने प्राथमिक पालतू जानवर के रूप में एक कुत्ते या बिल्ली के बीच चयन करना।"}
+  {
+    "id": "1",
+    "title": "The Ultimate Chocolate Chip Cookie Recipe",
+    "lang": "en",
+    "text": "A guide to baking the best cookies with butter, sugar, and chocolate."
+  },
+  {
+    "id": "2",
+    "title": "How to Travel Europe on a Budget",
+    "lang": "en",
+    "text": "Tips for backpacking, hostels, and cheap flights across Paris and Rome."
+  },
+  {
+    "id": "3",
+    "title": "The Future of Artificial Intelligence",
+    "lang": "en",
+    "text": "AI and machine learning are revolutionizing technology and software engineering."
+  },
+  {
+    "id": "4",
+    "title": "Easy Pasta Primavera",
+    "lang": "en",
+    "text": "A quick Italian dish with fresh vegetables, olive oil, and garlic."
+  },
+  {
+    "id": "5",
+    "title": "Top 10 Gadgets of 2024",
+    "lang": "en",
+    "text": "Smartphones, smartwatches, and the newest tech trends you need to know."
+  },
+  {
+    "id": "6",
+    "title": "Solo Travel in Japan",
+    "lang": "en",
+    "text": "Navigating Tokyo, eating sushi, and finding zen in Kyoto."
+  },
+  {
+    "id": "7",
+    "title": "Receta de Paella Valenciana",
+    "lang": "es",
+    "text": "Cómo preparar la auténtica paella española con arroz, pollo, conejo y azafrán."
+  },
+  {
+    "id": "8",
+    "title": "Viajar por Sudamérica",
+    "lang": "es",
+    "text": "Consejos para mochileros en Perú, Argentina y Colombia."
+  },
+  {
+    "id": "9",
+    "title": "Innovaciones Tecnológicas en España",
+    "lang": "es",
+    "text": "El crecimiento de las startups y la inteligencia artificial en Madrid."
+  },
+  {
+    "id": "10",
+    "title": "Tacos al Pastor Caseros",
+    "lang": "es",
+    "text": "Una receta deliciosa de la cocina mexicana con cerdo, piña y cilantro."
+  },
+  {
+    "id": "11",
+    "title": "Los Mejores Teléfonos Inteligentes",
+    "lang": "es",
+    "text": "Una revisión de la tecnología móvil actual y tendencias de smartphones."
+  },
+  {
+    "id": "12",
+    "title": "Guía de Viaje a la Patagonia",
+    "lang": "es",
+    "text": "Descubriendo los glaciares y montañas del sur de Argentina y Chile."
+  },
+  {
+    "id": "13",
+    "title": "मटर पनीर रेसिपी",
+    "lang": "hi",
+    "text": "घर पर स्वादिष्ट उत्तर भारतीय स्टाइल मटर पनीर कैसे बनाएं।"
+  },
+  {
+    "id": "14",
+    "title": "भारत में सोलो ट्रैवल",
+    "lang": "hi",
+    "text": "राजस्थान के किलों से लेकर केरल के बैकवाटर्स तक की यात्रा।"
+  },
+  {
+    "id": "15",
+    "title": "कृत्रिम बुद्धिमत्ता का भविष्य",
+    "lang": "hi",
+    "text": "कैसे एआई तकनीक और मशीन लर्निंग दुनिया को बदल रहे हैं।"
+  },
+  {
+    "id": "16",
+    "title": "चिकन बिरयानी बनाने की विधि",
+    "lang": "hi",
+    "text": "मसालेदार और खुशबूदार हैदराबादी बिरयानी।"
+  },
+  {
+    "id": "17",
+    "title": "लेटेस्ट स्मार्टफोन गैजेट्स",
+    "lang": "hi",
+    "text": "2024 के नए मोबाइल फोन और तकनीकी रुझान।"
+  },
+  {
+    "id": "18",
+    "title": "हिमालय की यात्रा",
+    "lang": "hi",
+    "text": "लेह-लद्दाख में ट्रेकिंग और खूबसूरत वादियों का अनुभव।"
+  },
+  {
+    "id": "19",
+    "title": "The Importance of a Good Pen",
+    "lang": "en",
+    "text": "Why writing with a fountain pen or a high-quality ballpoint pen improves your handwriting and paper notes."
+  },
+  {
+    "id": "20",
+    "title": "Back to School Supplies",
+    "lang": "en",
+    "text": "A checklist including a book, notebooks, pencils, erasers, and a reliable blue pen."
+  },
+  {
+    "id": "21",
+    "title": "Minimalist Workspace",
+    "lang": "en",
+    "text": "Keep your desk clean with just a laptop, a notebook, and a single pen on the table."
+  },
+  {
+    "id": "22",
+    "title": "Coffee and Books",
+    "lang": "en",
+    "text": "The perfect morning routine involves reading a good book with a hot cup of coffee by the window."
+  },
+  {
+    "id": "23",
+    "title": "How to Drive a Manual Car",
+    "lang": "en",
+    "text": "A beginner's guide to the clutch, gears, steering wheel, and driving on the road."
+  },
+  {
+    "id": "24",
+    "title": "Basic House Cleaning Tips",
+    "lang": "en",
+    "text": "Sweeping the floor, washing windows with water, and organizing your room with a box."
+  },
+  {
+    "id": "25",
+    "title": "A Guide to Men's Fashion",
+    "lang": "en",
+    "text": "Essential wardrobe items like a white shirt, blue jeans, a red jacket, and black leather shoes."
+  },
+  {
+    "id": "26",
+    "title": "Pets at Home",
+    "lang": "en",
+    "text": "Choosing between a dog or a cat as your primary pet in a small apartment."
+  },
+  {
+    "id": "27",
+    "title": "La Importancia de un Buen Bolígrafo",
+    "lang": "es",
+    "text": "Por qué escribir con una pluma estilográfica o un buen bolígrafo mejora tu caligrafía en papel."
+  },
+  {
+    "id": "28",
+    "title": "Material Escolar",
+    "lang": "es",
+    "text": "Una lista que incluye un libro, cuadernos, lápices, gomas de borrar y un bolígrafo azul confiable."
+  },
+  {
+    "id": "29",
+    "title": "Espacio de Trabajo Minimalista",
+    "lang": "es",
+    "text": "Mantén tu escritorio limpio con solo una computadora portátil, un cuaderno y un bolígrafo en la mesa."
+  },
+  {
+    "id": "30",
+    "title": "Café y Libros",
+    "lang": "es",
+    "text": "La rutina matutina perfecta incluye leer un buen libro con una taza de café caliente junto a la ventana."
+  },
+  {
+    "id": "31",
+    "title": "Cómo Conducir un Coche Manual",
+    "lang": "es",
+    "text": "Una guía para principiantes sobre el embrague, las marchas, el volante y conducir en la carretera."
+  },
+  {
+    "id": "32",
+    "title": "Consejos Básicos de Limpieza del Hogar",
+    "lang": "es",
+    "text": "Barrer el suelo, lavar las ventanas con agua y organizar tu habitación con una caja."
+  },
+  {
+    "id": "33",
+    "title": "Guía de Moda Masculina",
+    "lang": "es",
+    "text": "Artículos esenciales de vestuario como una camisa blanca, jeans azules, una chaqueta roja y zapatos de cuero negro."
+  },
+  {
+    "id": "34",
+    "title": "Mascotas en Casa",
+    "lang": "es",
+    "text": "Elegir entre un perro o un gato como mascota principal en un apartamento pequeño."
+  },
+  {
+    "id": "35",
+    "title": "एक अच्छे पेन का महत्व",
+    "lang": "hi",
+    "text": "क्यों एक फाउंटेन पेन या अच्छी गुणवत्ता वाले पेन से कागज पर लिखने से आपकी लिखावट में सुधार होता है।"
+  },
+  {
+    "id": "36",
+    "title": "स्कूल की सामग्री",
+    "lang": "hi",
+    "text": "एक चेकलिस्ट जिसमें एक किताब, नोटबुक, पेंसिल, इरेज़र और एक विश्वसनीय नीला पेन शामिल है।"
+  },
+  {
+    "id": "37",
+    "title": "मिनिमलिस्ट वर्कस्पेस",
+    "lang": "hi",
+    "text": "टेबल पर केवल एक लैपटॉप, एक नोटबुक और एक पेन के साथ अपने डेस्क को साफ रखें।"
+  },
+  {
+    "id": "38",
+    "title": "कॉफी और किताबें",
+    "lang": "hi",
+    "text": "एक सही सुबह की दिनचर्या में खिड़की के पास एक कप गर्म कॉफी के साथ एक अच्छी किताब पढ़ना शामिल है।"
+  },
+  {
+    "id": "39",
+    "title": "मैनुअल कार कैसे चलाएं",
+    "lang": "hi",
+    "text": "क्लच, गियर, स्टीयरिंग व्हील और सड़क पर ड्राइविंग के लिए एक शुरुआती मार्गदर्शिका।"
+  },
+  {
+    "id": "40",
+    "title": "घर की सफाई के बुनियादी टिप्स",
+    "lang": "hi",
+    "text": "फर्श पर झाड़ू लगाना, खिड़कियों को पानी से धोना और एक बॉक्स के साथ अपने कमरे को व्यवस्थित करना।"
+  },
+  {
+    "id": "41",
+    "title": "पुरुषों के फैशन के लिए एक गाइड",
+    "lang": "hi",
+    "text": "एक सफेद शर्ट, नीली जींस, एक लाल जैकेट और काले चमड़े के जूते जैसी आवश्यक अलमारी की वस्तुएं।"
+  },
+  {
+    "id": "42",
+    "title": "घर पर पालतू जानवर",
+    "lang": "hi",
+    "text": "एक छोटे से अपार्टमेंट में अपने प्राथमिक पालतू जानवर के रूप में एक कुत्ते या बिल्ली के बीच चयन करना।"
+  },
+  {
+    "id": "43",
+    "title": "চকলেট কুকি রেসিপি",
+    "lang": "bn",
+    "text": "মাখন, চিনি এবং চকলেট দিয়ে সেরা কুকি বেক করার রেসিপি।"
+  },
+  {
+    "id": "44",
+    "title": "ইউরোপে বাজেট ভ্রমণ",
+    "lang": "bn",
+    "text": "প্যারিস এবং রোমে সস্তায় ভ্রমণের টিপস, হোস্টেল এবং সস্তা বিমান।"
+  },
+  {
+    "id": "45",
+    "title": "কৃত্রিম বুদ্ধিমত্তার ভবিষ্যৎ",
+    "lang": "bn",
+    "text": "এআই এবং মেশিন লার্নিং কীভাবে প্রযুক্তি ও সফটওয়্যার ইঞ্জিনিয়ারিংয়ে বিপ্লব আনছে।"
+  },
+  {
+    "id": "46",
+    "title": "সেরা স্মার্টফোন ও গ্যাজেট ২০২৪",
+    "lang": "bn",
+    "text": "নতুন স্মার্টফোন, স্মার্টওয়াচ এবং প্রযুক্তির সর্বশেষ ট্রেন্ড।"
+  },
+  {
+    "id": "47",
+    "title": "చాక్లెట్ కుకీ రెసిపీ",
+    "lang": "te",
+    "text": "వెన్న, చక్కెర మరియు చాక్లెట్‌తో అత్యుత్తమ కుకీలు బేక్ చేయడానికి గైడ్."
+  },
+  {
+    "id": "48",
+    "title": "యూరప్‌లో బడ్జెట్ పర్యటన",
+    "lang": "te",
+    "text": "ప్యారిస్ మరియు రోమ్‌లో చవకైన హోస్టళ్ళు మరియు విమాన టిప్స్."
+  },
+  {
+    "id": "49",
+    "title": "కృత్రిమ మేధస్సు భవిష్యత్తు",
+    "lang": "te",
+    "text": "AI మరియు మెషిన్ లెర్నింగ్ సాంకేతికతను ఎలా విప్లవాత్మకంగా మారుస్తున్నాయి."
+  },
+  {
+    "id": "50",
+    "title": "స్మార్ట్‌ఫోన్ గ్యాడ్జెట్స్ 2024",
+    "lang": "te",
+    "text": "స్మార్ట్‌ఫోన్లు, స్మార్ట్‌వాచ్‌లు మరియు కొత్త సాంకేతిక ట్రెండ్లు."
+  },
+  {
+    "id": "51",
+    "title": "चॉकलेट कुकीज रेसिपी",
+    "lang": "mr",
+    "text": "लोणी, साखर आणि चॉकलेटसह सर्वोत्तम कुकीज बेक करण्याचे मार्गदर्शन."
+  },
+  {
+    "id": "52",
+    "title": "युरोपमध्ये बजेट प्रवास",
+    "lang": "mr",
+    "text": "पॅरिस आणि रोममध्ये स्वस्त हॉस्टेल आणि विमान प्रवासाचे टिप्स."
+  },
+  {
+    "id": "53",
+    "title": "कृत्रिम बुद्धिमत्तेचे भविष्य",
+    "lang": "mr",
+    "text": "AI आणि मशीन लर्निंग तंत्रज्ञान आणि सॉफ्टवेअर अभियांत्रिकीत क्रांती घडवत आहे."
+  },
+  {
+    "id": "54",
+    "title": "स्मार्टफोन गॅजेट्स 2024",
+    "lang": "mr",
+    "text": "नवीन स्मार्टफोन, स्मार्टवॉच आणि तंत्रज्ञानाचे ट्रेंड."
+  },
+  {
+    "id": "55",
+    "title": "சாக்லேட் குக்கீ செய்முறை",
+    "lang": "ta",
+    "text": "வெண்ணெய், சர்க்கரை மற்றும் சாக்லேட் கொண்டு சிறந்த குக்கீகளை சுடுவதற்கான வழிகாட்டி."
+  },
+  {
+    "id": "56",
+    "title": "ஐரோப்பாவில் பட்ஜெட் பயணம்",
+    "lang": "ta",
+    "text": "பாரிஸ் மற்றும் ரோமில் மலிவான ஹோஸ்டல்கள் மற்றும் விமான டிப்ஸ்."
+  },
+  {
+    "id": "57",
+    "title": "செயற்கை நுண்ணறிவின் எதிர்காலம்",
+    "lang": "ta",
+    "text": "AI மற்றும் இயந்திர கற்றல் தொழில்நுட்பம் மற்றும் மென்பொருள் பொறியியலை புரட்சிகரமாக மாற்றுகின்றன."
+  },
+  {
+    "id": "58",
+    "title": "ஸ்மார்ட்போன் கேஜெட்கள் 2024",
+    "lang": "ta",
+    "text": "ஸ்மார்ட்போன்கள், ஸ்மார்ட்வாட்ச்கள் மற்றும் புதிய தொழில்நுட்ப போக்குகள்."
+  },
+  {
+    "id": "59",
+    "title": "چاکلیٹ کوکیز کی ترکیب",
+    "lang": "ur",
+    "text": "مکھن، چینی اور چاکلیٹ کے ساتھ بہترین کوکیز بیک کرنے کی مکمل ترکیب۔"
+  },
+  {
+    "id": "60",
+    "title": "یورپ میں کم بجٹ سفر",
+    "lang": "ur",
+    "text": "پیرس اور روم میں سستے ہوسٹل، سفر کے مشورے اور سستی پروازیں۔"
+  },
+  {
+    "id": "61",
+    "title": "مصنوعی ذہانت کا مستقبل",
+    "lang": "ur",
+    "text": "AI اور مشین لرننگ کس طرح ٹیکنالوجی اور سافٹ ویئر انجینئرنگ میں انقلاب لا رہی ہے۔"
+  },
+  {
+    "id": "62",
+    "title": "بہترین اسمارٹ فون گیجٹس 2024",
+    "lang": "ur",
+    "text": "نئے اسمارٹ فون، اسمارٹ واچ اور جدید تکنیکی رجحانات۔"
+  },
+  {
+    "id": "63",
+    "title": "ચોકલેટ કૂકી રેસીપી",
+    "lang": "gu",
+    "text": "માખણ, ખાંડ અને ચોકલેટ સાથે શ્રેષ્ઠ કૂકી બેક કરવાની સ્વાદિષ્ટ રેસીપી."
+  },
+  {
+    "id": "64",
+    "title": "યુરોપમાં બજેટ પ્રવાસ",
+    "lang": "gu",
+    "text": "પેરિસ અને રોમમાં સસ્તી હૉસ્ટેલ, ઉડાનના ટિપ્સ અને સસ્તા મુસાફરીના રસ્તા."
+  },
+  {
+    "id": "65",
+    "title": "કૃત્રિમ બુદ્ધિમત્તાનું ભવિષ્ય",
+    "lang": "gu",
+    "text": "AI અને મશીન લર્નિંગ ટેક્નોલોજી અને સૉફ્ટવેર ઇન્જિનિયરિંગમાં ક્રાંતિ લાવી રહ્યા છે."
+  },
+  {
+    "id": "66",
+    "title": "સ્માર્ટફોન ગેજેટ્સ 2024",
+    "lang": "gu",
+    "text": "નવા સ્માર્ટફોન, સ્માર્ટવૉચ અને ટેક્નોલૉજીના ટ્રેન્ડ."
+  },
+  {
+    "id": "67",
+    "title": "ಚಾಕೊಲೇಟ್ ಕುಕ್ಕೀ ರೆಸಿಪಿ",
+    "lang": "kn",
+    "text": "ಬೆಣ್ಣೆ, ಸಕ್ಕರೆ ಮತ್ತು ಚಾಕೊಲೇಟ್ ಬಳಸಿ ಅತ್ಯುತ್ತಮ ಕುಕ್ಕೀ ಬೇಕ್ ಮಾಡಲು ಮಾರ್ಗದರ್ಶಿ."
+  },
+  {
+    "id": "68",
+    "title": "ಯುರೋಪ್‌ನಲ್ಲಿ ಬಜೆಟ್ ಪ್ರವಾಸ",
+    "lang": "kn",
+    "text": "ಪ್ಯಾರಿಸ್ ಮತ್ತು ರೋಮ್‌ನಲ್ಲಿ ಅಗ್ಗದ ಹೋಸ್ಟೆಲ್ ಮತ್ತು ವಿಮಾನ ಟಿಪ್ಸ್."
+  },
+  {
+    "id": "69",
+    "title": "ಕೃತ್ರಿಮ ಬುದ್ಧಿಮತ್ತೆಯ ಭವಿಷ್ಯ",
+    "lang": "kn",
+    "text": "AI ಮತ್ತು ಮೆಷಿನ್ ಲರ್ನಿಂಗ್ ತಂತ್ರಜ್ಞಾನ ಮತ್ತು ಸಾಫ್ಟ್‌ವೇರ್ ಎಂಜಿನಿಯರಿಂಗ್ ಅನ್ನು ಕ್ರಾಂತಿಗೊಳಿಸುತ್ತಿವೆ."
+  },
+  {
+    "id": "70",
+    "title": "ಸ್ಮಾರ್ಟ್‌ಫೋನ್ ಗ್ಯಾಜೆಟ್‌ಗಳು 2024",
+    "lang": "kn",
+    "text": "ಹೊಸ ಸ್ಮಾರ್ಟ್‌ಫೋನ್, ಸ್ಮಾರ್ಟ್‌ವಾಚ್ ಮತ್ತು ತಂತ್ರಜ್ಞಾನ ಪ್ರವೃತ್ತಿಗಳು."
+  },
+  {
+    "id": "71",
+    "title": "ചോക്കലേറ്റ് കുക്കി റെസിപ്പി",
+    "lang": "ml",
+    "text": "വെണ്ണ, പഞ്ചസാര, ചോക്കലേറ്റ് ഉപയോഗിച്ച് മികച്ച കുക്കി ബേക്ക് ചെയ്യാനുള്ള ഗൈഡ്."
+  },
+  {
+    "id": "72",
+    "title": "യൂറോപ്പിൽ ബജറ്റ് യാത്ര",
+    "lang": "ml",
+    "text": "പാരീസിലും റോമിലും ചെലവ് കുറഞ്ഞ ഹോസ്റ്റലുകളും സഞ്ചാര ടിപ്സും."
+  },
+  {
+    "id": "73",
+    "title": "കൃത്രിമ ബുദ്ധിമത്തയുടെ ഭാവി",
+    "lang": "ml",
+    "text": "AI ഉം മെഷീൻ ലേണിംഗും സാങ്കേതികവിദ്യ, സോഫ്റ്റ്‌വെയർ എഞ്ചിനീയറിംഗ് എന്നിവ വിപ്ലവകരമായി മാറ്റുന്നു."
+  },
+  {
+    "id": "74",
+    "title": "സ്മാർട്ട്ഫോൺ ഗ്യാഡ്ജെറ്റുകൾ 2024",
+    "lang": "ml",
+    "text": "പുതിയ സ്മാർട്ട്ഫോൺ, സ്മാർട്ട്‌വാച്ച്, സാങ്കേതിക ട്രെൻഡുകൾ."
+  },
+  {
+    "id": "75",
+    "title": "ଚକୋଲେଟ୍ କୁକି ରେସିପି",
+    "lang": "or",
+    "text": "ମାଖନ, ଚିନି ଏବଂ ଚକୋଲେଟ୍ ସହ ସ୍ୱାଦିଷ୍ଟ କୁକି ବେକ୍ କରିବାର ରେସିପି।"
+  },
+  {
+    "id": "76",
+    "title": "ଏଆଇ ଓ ମେସିନ ଲର୍ନିଂ",
+    "lang": "or",
+    "text": "କୃତ୍ରିମ ବୁଦ୍ଧିମତ୍ତା ଏବଂ ଯନ୍ତ୍ର ଶିକ୍ଷା ପ୍ରଯୁକ୍ତିରେ ବିପ୍ଳବ ଆଣୁଛି।"
+  },
+  {
+    "id": "77",
+    "title": "ଯୂରୋପ ଭ୍ରମଣ ଗାଇଡ",
+    "lang": "or",
+    "text": "ଯୂରୋପ ଭ୍ରମଣ ପାଇଁ ଶ୍ରେଷ୍ଠ ଟିପ୍ସ ଏବଂ ସ୍ମାର୍ଟଫୋନ ଗ୍ୟାଜେଟ ଟ୍ରେଣ୍ଡ।"
+  },
+  {
+    "id": "78",
+    "title": "ਚਾਕਲੇਟ ਕੁਕੀ ਵਿਧੀ",
+    "lang": "pa",
+    "text": "ਮੱਖਣ, ਚੀਨੀ ਅਤੇ ਚਾਕਲੇਟ ਨਾਲ ਸਭ ਤੋਂ ਵਧੀਆ ਕੁਕੀਜ਼ ਬਣਾਉਣ ਦੀ ਵਿਧੀ।"
+  },
+  {
+    "id": "79",
+    "title": "ਯੂਰਪ ਵਿੱਚ ਯਾਤਰਾ ਗਾਈਡ",
+    "lang": "pa",
+    "text": "ਪੈਰਿਸ ਅਤੇ ਰੋਮ ਵਿੱਚ ਸਸਤੇ ਹੋਸਟਲਾਂ ਅਤੇ ਉਡਾਣਾਂ ਨਾਲ ਸਫ਼ਰ ਕਰਨ ਦੇ ਟਿਪਸ।"
+  },
+  {
+    "id": "80",
+    "title": "ਆਰਟੀਫੀਸ਼ੀਅਲ ਇੰਟੈਲੀਜੈਂਸ ਦਾ ਭਵਿੱਖ",
+    "lang": "pa",
+    "text": "AI ਅਤੇ ਮਸ਼ੀਨ ਲਰਨਿੰਗ ਕਿਵੇਂ ਤਕਨਾਲੋਜੀ ਅਤੇ ਸਾਫ਼ਟਵੇਅਰ ਇੰਜੀਨੀਅਰਿੰਗ ਵਿੱਚ ਕ੍ਰਾਂਤੀ ਲਿਆ ਰਹੀਆਂ ਹਨ।"
+  },
+  {
+    "id": "81",
+    "title": "চকলেট কুকি ৰেচিপি",
+    "lang": "as",
+    "text": "মাখন, চেনি আৰু চকলেটৰে সৰ্বোত্তম কুকি বেক কৰাৰ ৰেচিপি।"
+  },
+  {
+    "id": "82",
+    "title": "ইউৰোপত ভ্ৰমণ গাইড",
+    "lang": "as",
+    "text": "পেৰিছ আৰু ৰোমত সস্তা হোষ্টেল আৰু স্মাৰ্টফোন গেজেটৰ টিপছ।"
+  },
+  {
+    "id": "83",
+    "title": "কৃত্ৰিম বুদ্ধিমত্তাৰ ভৱিষ্যৎ",
+    "lang": "as",
+    "text": "এআই আৰু মেচিন লাৰ্নিং কেনেকৈ প্ৰযুক্তি আৰু চফ্টৱেৰ অভিযান্ত্ৰিকীত বিপ্লৱ আনিছে।"
+  },
+  {
+    "id": "84",
+    "title": "चाकलेट कुकी विधिः",
+    "lang": "sa",
+    "text": "माखन-शर्करा-चाकलेट-युतस्य उत्तमस्य कुकी-निर्माणस्य सम्पूर्णा विधिः।"
+  },
+  {
+    "id": "85",
+    "title": "यात्रामार्गदर्शनम् यूरोपे",
+    "lang": "sa",
+    "text": "यूरोप-देशे न्यूनव्ययेन होस्टेल-आतिथ्यस्य स्मार्टफोन-गैजेट-ट्रेण्डानां च उत्तम-मार्गाः।"
+  },
+  {
+    "id": "86",
+    "title": "कृत्रिम-बुद्धिमत्ता-भविष्यम्",
+    "lang": "sa",
+    "text": "AI यंत्रशिक्षणं च प्रौद्योगिकीं सॉफ्टवेयर-अभियांत्रिकीं च क्रान्तिकारकरूपेण परिवर्तयतः।"
+  },
+  {
+    "id": "87",
+    "title": "Recette de Cookies au Chocolat",
+    "lang": "fr",
+    "text": "Un guide pour cuire les meilleurs cookies avec du beurre, du sucre et du chocolat."
+  },
+  {
+    "id": "88",
+    "title": "Voyager en Europe à Petit Budget",
+    "lang": "fr",
+    "text": "Conseils pour le sac à dos, les auberges et les vols pas chers entre Paris et Rome."
+  },
+  {
+    "id": "89",
+    "title": "L'Avenir de l'Intelligence Artificielle",
+    "lang": "fr",
+    "text": "L'IA et l'apprentissage automatique révolutionnent la technologie et le génie logiciel."
+  },
+  {
+    "id": "90",
+    "title": "Les Meilleurs Smartphones 2024",
+    "lang": "fr",
+    "text": "Smartphones, montres intelligentes et les dernières tendances technologiques à connaître."
+  },
+  {
+    "id": "91",
+    "title": "وصفة كوكيز الشوكولاتة",
+    "lang": "ar",
+    "text": "دليل لخبز أفضل الكوكيز بالزبدة والسكر والشوكولاتة."
+  },
+  {
+    "id": "92",
+    "title": "السفر في أوروبا بميزانية محدودة",
+    "lang": "ar",
+    "text": "نصائح للتجوال وأرخص الفنادق والرحلات الجوية الرخيصة بين باريس وروما."
+  },
+  {
+    "id": "93",
+    "title": "مستقبل الذكاء الاصطناعي",
+    "lang": "ar",
+    "text": "يحدث الذكاء الاصطناعي والتعلم الآلي ثورة في التكنولوجيا وهندسة البرمجيات."
+  },
+  {
+    "id": "94",
+    "title": "أفضل الهواتف الذكية 2024",
+    "lang": "ar",
+    "text": "الهواتف الذكية والساعات الذكية وأحدث الاتجاهات التقنية."
+  },
+  {
+    "id": "95",
+    "title": "巧克力曲奇食谱",
+    "lang": "zh",
+    "text": "用黄油、糖和巧克力烤制最好曲奇的指南。"
+  },
+  {
+    "id": "96",
+    "title": "欧洲穷游攻略",
+    "lang": "zh",
+    "text": "在巴黎和罗马背包旅行、青年旅馆和便宜机票的技巧。"
+  },
+  {
+    "id": "97",
+    "title": "人工智能的未来",
+    "lang": "zh",
+    "text": "人工智能和机器学习正在革新技术和软件工程。"
+  },
+  {
+    "id": "98",
+    "title": "2024年最佳智能手机",
+    "lang": "zh",
+    "text": "智能手机、智能手表和您需要了解的最新科技趋势。"
+  },
+  {
+    "id": "99",
+    "title": "Receita de Cookies de Chocolate",
+    "lang": "pt",
+    "text": "Um guia para assar os melhores cookies com manteiga, açúcar e chocolate."
+  },
+  {
+    "id": "100",
+    "title": "Viajar pela Europa com Pouco Dinheiro",
+    "lang": "pt",
+    "text": "Dicas para mochileiros, albergues e passagens aéreas baratas entre Paris e Roma."
+  },
+  {
+    "id": "101",
+    "title": "O Futuro da Inteligência Artificial",
+    "lang": "pt",
+    "text": "A IA e o aprendizado de máquina estão revolucionando a tecnologia e a engenharia de software."
+  },
+  {
+    "id": "102",
+    "title": "Melhores Smartphones de 2024",
+    "lang": "pt",
+    "text": "Smartphones, smartwatches e as mais novas tendências tecnológicas."
+  },
+  {
+    "id": "103",
+    "title": "Schokoladenkekse Rezept",
+    "lang": "de",
+    "text": "Eine Anleitung zum Backen der besten Kekse mit Butter, Zucker und Schokolade."
+  },
+  {
+    "id": "104",
+    "title": "Günstig durch Europa Reisen",
+    "lang": "de",
+    "text": "Tipps für Rucksackreisen, Hostels und günstige Flüge zwischen Paris und Rom."
+  },
+  {
+    "id": "105",
+    "title": "Die Zukunft der Künstlichen Intelligenz",
+    "lang": "de",
+    "text": "KI und maschinelles Lernen revolutionieren die Technologie und Softwareentwicklung."
+  },
+  {
+    "id": "106",
+    "title": "Die besten Smartphones 2024",
+    "lang": "de",
+    "text": "Smartphones, Smartwatches und die neuesten Technologietrends die man kennen muss."
+  },
+  {
+    "id": "107",
+    "title": "hello",
+    "lang": "en",
+    "text": "this is a test document"
+  },
+  {
+    "id": "108",
+    "title": "test",
+    "lang": "en",
+    "text": "a phone is very important in out day to day life"
+  },
+  {
+    "id": "109",
+    "title": "hello",
+    "lang": "en",
+    "text": "hiiiiiiiiiii"
+  },
+  {
+    "id": "110",
+    "title": "text",
+    "lang": "en",
+    "text": "pen"
+  }
 ]

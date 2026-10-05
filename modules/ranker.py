@@ -1,31 +1,63 @@
 import math
 
-def rank_documents(query_terms, index):
+def rank_documents_with_breakdown(query_terms, index, term_weights=None):
+    """
+    Computes TF-IDF scores with detailed per-term mathematical breakdown.
+    Supports optional term_weights dict to scale exact matches vs meaning-expansion terms.
+    Time Complexity: O(Q * D) scoring + O(R log R) sorting.
+    Returns: (ranked_list, doc_breakdown, term_stats)
+    """
+    scores = {}
+    breakdowns = {}
+    term_stats = {}
+    N = index.total_docs
+
+    if N == 0:
+        return [], {}, {}
+
+    for term in query_terms:
+        term_freqs = index.get_term_freqs(term)
+        df = index.get_doc_freq(term)
+
+        if df == 0:
+            term_stats[term] = {'df': 0, 'idf': 0.0, 'postings_count': 0, 'weight': 1.0}
+            continue
+
+        weight = term_weights.get(term, 1.0) if term_weights else 1.0
+
+        # IDF: ln(N / (1 + df)) + 1
+        idf = math.log(N / (1 + df)) + 1
+        term_stats[term] = {
+            'df': df,
+            'idf': round(idf, 4),
+            'postings_count': len(term_freqs),
+            'weight': round(weight, 2)
+        }
+
+        for doc_id, tf in term_freqs.items():
+            contrib = tf * idf * weight
+            scores[doc_id] = scores.get(doc_id, 0.0) + contrib
+            if doc_id not in breakdowns:
+                breakdowns[doc_id] = []
+            breakdowns[doc_id].append({
+                'term': term,
+                'tf': tf,
+                'df': df,
+                'idf': round(idf, 4),
+                'weight': round(weight, 2),
+                'contribution': round(contrib, 4)
+            })
+
+    # O(R log R) where R is the number of matched documents
+    ranked = sorted(scores.items(), key=lambda item: item[1], reverse=True)
+    return ranked, breakdowns, term_stats
+
+
+def rank_documents(query_terms, index, term_weights=None):
     """
     O(Q * D) time complexity where Q is the number of query terms 
     and D is the average number of documents containing a query term.
     """
-    scores = {}
-    N = index.total_docs
-    
-    if N == 0:
-        return []
-        
-    for term in query_terms:
-        term_freqs = index.get_term_freqs(term)
-        df = index.get_doc_freq(term)
-        
-        if df == 0:
-            continue
-            
-        # IDF (Inverse Document Frequency)
-        idf = math.log(N / (1 + df)) + 1
-        
-        for doc_id, tf in term_freqs.items():
-            # TF-IDF calculation
-            tf_idf = tf * idf
-            scores[doc_id] = scores.get(doc_id, 0.0) + tf_idf
-            
-    # O(R log R) where R is the number of matched documents
-    ranked = sorted(scores.items(), key=lambda item: item[1], reverse=True)
+    ranked, _, _ = rank_documents_with_breakdown(query_terms, index, term_weights=term_weights)
     return ranked
+

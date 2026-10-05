@@ -7,99 +7,578 @@
     <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
-    <div class="container">
-        <header>
-            <div class="hero-section">
-                <h1>Multilingual Text Retriever</h1>
-                <p class="tagline">A classical DSA-powered search engine for English, Spanish, and Hindi.</p>
-            </div>
-            <div class="search-top-row">
-                <div class="search-input-wrapper">
-                    <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#7a7a85" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <circle cx="11" cy="11" r="8"></circle>
-                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                    </svg>
-                    <input type="text" id="searchInput" placeholder="pen" autofocus>
-                </div>
-                <button class="search-btn" onclick="performSearch()">Search</button>
-            </div>
-            <div class="search-bottom-row">
-                <select id="langFilter" class="custom-select">
-                    <option value="all">Language: All ▼</option>
-                    <option value="en">Language: EN</option>
-                    <option value="es">Language: ES</option>
-                    <option value="hi">Language: HI</option>
-                </select>
-                <button onclick="performSearch(true)" class="browse-btn">Browse All</button>
-            </div>
-            <div class="meta-info" style="display: none;">
-                <span id="latency" class="latency"></span>
-                <a href="/benchmark" class="benchmark-link">View Benchmarks</a>
-            </div>
-            <div id="correction" class="correction-note" style="display: none;"></div>
-        </header>
-        
-        <main id="resultsContainer">
-            <!-- Results will be injected here -->
-        </main>
+
+<!-- ═══════════════════════  ADD DOCUMENT MODAL  ════════════════════════ -->
+<div id="addModal" class="modal-overlay" style="display:none;" onclick="closeModalOnBackdrop(event)">
+    <div class="modal-box">
+        <h2>➕ Add New Document</h2>
+
+        <label for="newTitle">Title</label>
+        <input type="text" id="newTitle" placeholder="e.g. Biryani Recipe">
+
+        <label for="newLang">Language</label>
+        <select id="newLang">
+            <optgroup label="Indian Languages">
+                <option value="hi">Hindi (हिन्दी)</option>
+                <option value="bn">Bengali (বাংলা)</option>
+                <option value="te">Telugu (తెలుగు)</option>
+                <option value="mr">Marathi (मराठी)</option>
+                <option value="ta">Tamil (தமிழ்)</option>
+                <option value="ur">Urdu (اردو)</option>
+                <option value="gu">Gujarati (ગુજરાતી)</option>
+                <option value="kn">Kannada (ಕನ್ನಡ)</option>
+                <option value="ml">Malayalam (മലയാളം)</option>
+                <option value="or">Odia (ଓଡ଼ିଆ)</option>
+                <option value="pa">Punjabi (ਪੰਜਾਬੀ)</option>
+                <option value="as">Assamese (অসমীয়া)</option>
+                <option value="sa">Sanskrit (संस्कृतम्)</option>
+            </optgroup>
+            <optgroup label="Other Languages">
+                <option value="en" selected>English</option>
+                <option value="es">Spanish (Español)</option>
+                <option value="fr">French (Français)</option>
+                <option value="de">German (Deutsch)</option>
+                <option value="pt">Portuguese (Português)</option>
+                <option value="ar">Arabic (العربية)</option>
+                <option value="zh">Chinese (中文)</option>
+            </optgroup>
+        </select>
+
+        <label for="newText">Content</label>
+        <textarea id="newText" placeholder="Enter the document content here..."></textarea>
+
+        <div class="modal-actions">
+            <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+            <button class="btn-submit" onclick="submitDoc()">Add Document</button>
+        </div>
     </div>
+</div>
 
-    <script>
-        document.getElementById('searchInput').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                performSearch();
-            }
-        });
+<!-- ═══════════════════════  DEFINE WORD MODAL  ════════════════════════ -->
+<div id="defineModal" class="modal-overlay" style="display:none;" onclick="closeDefineModalOnBackdrop(event)">
+    <div class="modal-box define-modal-box">
+        <div class="modal-header">
+            <h2>📖 Wiktionary Dictionary Lookup</h2>
+            <button class="modal-close-x" onclick="closeDefineModal()" title="Close">✕</button>
+        </div>
+        <p class="modal-subtitle">Instant word meanings across 20+ languages powered by Wiktionary REST API & LRU Caching.</p>
 
-        async function performSearch(isBrowse = false) {
-            let query = document.getElementById('searchInput').value.trim();
-            if (isBrowse) {
-                query = '';
-                document.getElementById('searchInput').value = '';
-            } else if (!query) {
-                return;
-            }
+        <div class="define-input-group">
+            <input type="text" id="defineWordInput" placeholder="Enter any word (e.g., algorithm, tecnología, किताब)..." onkeypress="handleDefineKeyPress(event)">
+            <select id="defineLangSelect">
+                <option value="all">Auto / All Languages</option>
+                <optgroup label="Indian Languages">
+                    <option value="hi">Hindi (हिन्दी)</option>
+                    <option value="bn">Bengali (বাংলা)</option>
+                    <option value="te">Telugu (తెలుగు)</option>
+                    <option value="mr">Marathi (मराठी)</option>
+                    <option value="ta">Tamil (தமிழ்)</option>
+                    <option value="ur">Urdu (اردو)</option>
+                    <option value="gu">Gujarati (ગુજરાતી)</option>
+                    <option value="kn">Kannada (ಕನ್ನಡ)</option>
+                    <option value="ml">Malayalam (മലയാളം)</option>
+                    <option value="or">Odia (ଓଡ଼ିଆ)</option>
+                    <option value="pa">Punjabi (ਪੰਜਾਬੀ)</option>
+                    <option value="as">Assamese (অসমীয়া)</option>
+                    <option value="sa">Sanskrit (संस्कृतम्)</option>
+                </optgroup>
+                <optgroup label="Other Languages">
+                    <option value="en">English</option>
+                    <option value="es">Spanish (Español)</option>
+                    <option value="fr">French (Français)</option>
+                    <option value="de">German (Deutsch)</option>
+                    <option value="pt">Portuguese (Português)</option>
+                    <option value="ar">Arabic (العربية)</option>
+                    <option value="zh">Chinese (中文)</option>
+                </optgroup>
+            </select>
+            <button class="btn-lookup" onclick="lookupDefinitionModal()">Lookup</button>
+        </div>
 
-            const lang = document.getElementById('langFilter').value;
-            const resultsContainer = document.getElementById('resultsContainer');
-            const latencySpan = document.getElementById('latency');
-            const correctionDiv = document.getElementById('correction');
-            
-            resultsContainer.innerHTML = '<div class="loading">Searching...</div>';
-            latencySpan.textContent = '';
-            correctionDiv.style.display = 'none';
+        <div id="modalDefinitionResult" class="definition-result-area"></div>
+    </div>
+</div>
 
-            try {
-                const response = await fetch(`/search?q=${encodeURIComponent(query)}&lang=${lang}`);
-                const data = await response.json();
-                
-                latencySpan.textContent = `Query latency: ${data.latency} ms`;
-                
-                if (data.corrected_query) {
-                    correctionDiv.textContent = `Showing results for: ${data.corrected_query}`;
-                    correctionDiv.style.display = 'block';
-                }
+<!-- ═══════════════════════  MAIN PAGE  ═════════════════════════════════ -->
+<div class="container">
+    <header>
+        <div class="hero-section">
+            <h1>Multilingual Text Retriever</h1>
+            <p class="tagline">DSA-powered search engine supporting 20 languages — 13 Indian + 7 global.</p>
+        </div>
 
-                if (data.results.length === 0) {
-                    resultsContainer.innerHTML = '<div class="no-results">No results found.</div>';
-                    return;
-                }
+        <!-- Search bar -->
+        <div class="search-top-row">
+            <div class="search-input-wrapper">
+                <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                     fill="none" stroke="#7a7a85" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                <input type="text" id="searchInput"
+                       placeholder="Try: chocolate · travel · AI · स्मार्टफोन · চকলেট"
+                       autofocus>
+            </div>
+            <button class="search-btn" onclick="performSearch()">Search</button>
+        </div>
 
-                resultsContainer.innerHTML = data.results.map(result => `
-                    <div class="result-item">
-                        <div class="lang-tag-wrapper">
-                            <span class="lang-tag lang-${result.lang.toLowerCase()}">${result.lang.toUpperCase()}</span>
+        <!-- Controls row -->
+        <div class="search-bottom-row">
+            <div class="custom-select-wrapper">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                     stroke="#7a7a85" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/>
+                    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                </svg>
+                <select id="langFilter" onchange="performSearch()">
+                    <option value="all">All Languages</option>
+                    <optgroup label="Indian Languages">
+                        <option value="hi">Hindi (हिन्दी)</option>
+                        <option value="bn">Bengali (বাংলা)</option>
+                        <option value="te">Telugu (తెలుగు)</option>
+                        <option value="mr">Marathi (मराठी)</option>
+                        <option value="ta">Tamil (தமிழ்)</option>
+                        <option value="ur">Urdu (اردو)</option>
+                        <option value="gu">Gujarati (ગુજરાતી)</option>
+                        <option value="kn">Kannada (ಕನ್ನಡ)</option>
+                        <option value="ml">Malayalam (മലയാളം)</option>
+                        <option value="or">Odia (ଓଡ଼ିଆ)</option>
+                        <option value="pa">Punjabi (ਪੰਜਾਬੀ)</option>
+                        <option value="as">Assamese (অসমীয়া)</option>
+                        <option value="sa">Sanskrit (संस्कृतम्)</option>
+                    </optgroup>
+                    <optgroup label="Other Languages">
+                        <option value="en">English</option>
+                        <option value="es">Spanish (Español)</option>
+                        <option value="fr">French (Français)</option>
+                        <option value="de">German (Deutsch)</option>
+                        <option value="pt">Portuguese (Português)</option>
+                        <option value="ar">Arabic (العربية)</option>
+                        <option value="zh">Chinese (中文)</option>
+                    </optgroup>
+                </select>
+            </div>
+
+            <button class="browse-btn" onclick="performSearch(true)">Browse All</button>
+
+            <button class="define-trigger-btn" onclick="openDefineModal()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+                </svg>
+                Define Word
+            </button>
+
+            <label class="toggle-meaning-label" title="Search documents that have the same dictionary meaning (via Wiktionary API)">
+                <input type="checkbox" id="meaningToggle" checked onchange="performSearch()">
+                <span>📖 Meaning Search</span>
+            </label>
+
+            <button class="add-doc-btn" onclick="openModal()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                     stroke="white" stroke-width="2.5" stroke-linecap="round">
+                    <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+                </svg>
+                Add Document
+            </button>
+        </div>
+
+        <!-- Latency + benchmark -->
+        <div class="meta-info" id="metaInfo" style="display:none;">
+            <span id="latency" class="latency"></span>
+            <a href="/benchmark" class="benchmark-link">View Benchmarks →</a>
+        </div>
+
+        <!-- Spell-correction note -->
+        <div id="correction" class="correction-note" style="display:none;"></div>
+    </header>
+
+    <!-- Wiktionary Inline Definition Box -->
+    <div id="inlineDefinitionBox" style="display:none;"></div>
+
+    <main id="resultsContainer">
+        <!-- results injected here -->
+    </main>
+</div>
+
+<!-- ═══════════════════════  SCRIPTS  ═══════════════════════════════════ -->
+<script>
+// ── Language display map ──────────────────────────────────────────────────
+const LANG_NAMES = {
+    hi:'HI', bn:'BN', te:'TE', mr:'MR', ta:'TA', ur:'UR',
+    gu:'GU', kn:'KN', ml:'ML', or:'OR', pa:'PA', as:'AS', sa:'SA',
+    en:'EN', es:'ES', fr:'FR', de:'DE', pt:'PT', ar:'AR', zh:'ZH'
+};
+
+// ── Search ────────────────────────────────────────────────────────────────
+document.getElementById('searchInput').addEventListener('keypress', e => {
+    if (e.key === 'Enter') performSearch();
+});
+
+async function performSearch(isBrowse = false) {
+    let query = document.getElementById('searchInput').value.trim();
+    const inlineDefBox = document.getElementById('inlineDefinitionBox');
+    inlineDefBox.style.display = 'none';
+    inlineDefBox.innerHTML = '';
+
+    if (isBrowse) {
+        query = '';
+        document.getElementById('searchInput').value = '';
+    } else if (!query) {
+        return;
+    }
+
+    const lang = document.getElementById('langFilter').value;
+    const useMeaning = document.getElementById('meaningToggle') ? document.getElementById('meaningToggle').checked : true;
+    const resultsContainer = document.getElementById('resultsContainer');
+    const latencySpan      = document.getElementById('latency');
+    const correctionDiv    = document.getElementById('correction');
+    const metaInfo         = document.getElementById('metaInfo');
+
+    resultsContainer.innerHTML = '<div class="loading">Searching & retrieving meanings...</div>';
+    latencySpan.textContent = '';
+    correctionDiv.style.display = 'none';
+
+    try {
+        const res  = await fetch(`/search?q=${encodeURIComponent(query)}&lang=${lang}&meaning=${useMeaning}`);
+        const data = await res.json();
+
+        metaInfo.style.display = 'flex';
+        latencySpan.textContent = `⏱ ${data.latency} ms`;
+
+        if (data.corrected_query) {
+            correctionDiv.innerHTML = `Did you mean: "<strong>${escapeHtml(data.corrected_query)}</strong>"? 
+                <a href="javascript:void(0)" onclick="openDefineModal('${escapeJs(data.corrected_query)}', '${lang}')" style="margin-left:0.5rem;color:var(--accent);text-decoration:underline;">📖 Define</a>`;
+            correctionDiv.style.display = 'block';
+        }
+
+        // Display Meaning Search Banner if Wiktionary returned definitions
+        if (data.meaning_info && data.meaning_info.definitions && data.meaning_info.definitions.length > 0) {
+            const mInfo = data.meaning_info;
+            const defsHtml = mInfo.definitions.map(d => `
+                <div class="meaning-def-item">
+                    <strong>${escapeHtml(d.word)}</strong>: ${escapeHtml(d.summary)}
+                    ${d.wiktionary_url ? `<a href="${d.wiktionary_url}" target="_blank" rel="noopener" style="margin-left:0.4rem;font-size:0.8rem;color:var(--accent-light);">Wiktionary ↗</a>` : ''}
+                </div>
+            `).join('');
+
+            const termsHtml = (mInfo.meaning_terms && mInfo.meaning_terms.length > 0)
+                ? `<div class="meaning-expansion-pills">
+                    <span>Expanded meaning concepts in index:</span>
+                    ${mInfo.meaning_terms.map(t => `<span class="meaning-expansion-pill">${escapeHtml(t)}</span>`).join('')}
+                   </div>`
+                : '';
+
+            inlineDefBox.innerHTML = `
+                <div class="meaning-search-banner">
+                    <div class="meaning-banner-header">
+                        <div class="meaning-banner-title">
+                            <span>📖 Wiktionary Meaning Search Active</span>
+                            <span class="meaning-banner-cached">Semantic Retrieval</span>
                         </div>
-                        <div class="result-content">
-                            <h3 class="result-title">${result.title}</h3>
-                            <p class="result-snippet">${result.snippet}</p>
-                        </div>
+                        <button class="definition-close-btn" onclick="dismissInlineDefinition()" title="Dismiss">✕</button>
                     </div>
-                `).join('');
-            } catch (error) {
-                resultsContainer.innerHTML = '<div class="error">An error occurred during search.</div>';
+                    ${defsHtml}
+                    ${termsHtml}
+                </div>
+            `;
+            inlineDefBox.style.display = 'block';
+        } else if (query) {
+            const primaryWord = (data.query_terms && data.query_terms.length > 0)
+                ? data.query_terms[0]
+                : query.split(/\s+/)[0];
+            if (primaryWord) {
+                fetchInlineDefinition(primaryWord, lang);
             }
         }
-    </script>
+
+        if (data.results.length === 0) {
+            resultsContainer.innerHTML = '<div class="no-results">No results found. Try a different query or language.</div>';
+            return;
+        }
+
+        resultsContainer.innerHTML = data.results.map(r => {
+            let pills = [];
+            if (r.matched_by_meaning && r.matched_by_meaning.length > 0) {
+                pills.push(`<span class="match-pill meaning-pill" title="Retrieved via Wiktionary semantic meaning">💡 Matched Meaning: <strong>${escapeHtml(r.matched_by_meaning.join(', '))}</strong></span>`);
+            }
+            if (r.matched_by_exact && r.matched_by_exact.length > 0) {
+                pills.push(`<span class="match-pill exact-pill" title="Exact query match">✓ Exact: <strong>${escapeHtml(r.matched_by_exact.join(', '))}</strong></span>`);
+            }
+            if (r.matched_by_synonym && r.matched_by_synonym.length > 0) {
+                pills.push(`<span class="match-pill syn-pill" title="Cross-lingual synonym">🌐 Synonym: <strong>${escapeHtml(r.matched_by_synonym.join(', '))}</strong></span>`);
+            }
+            const matchRow = pills.length > 0 ? `<div class="match-reasons-row">${pills.join('')}</div>` : '';
+
+            return `
+                <div class="result-item" id="doc-${r.id}">
+                    <button class="delete-btn" onclick="deleteDoc('${r.id}')" title="Delete document">✕</button>
+                    <div class="lang-tag-wrapper">
+                        <span class="lang-tag lang-${r.lang.toLowerCase()}">${LANG_NAMES[r.lang.toLowerCase()] || r.lang.toUpperCase()}</span>
+                    </div>
+                    <div class="result-content">
+                        <h3 class="result-title">
+                            ${r.title}
+                            <button class="define-word-mini-btn" onclick="openDefineModalForTitle('${escapeJs(r.title)}', '${r.lang}')" title="Look up meaning in Wiktionary">📖</button>
+                        </h3>
+                        <p class="result-snippet">${r.snippet}</p>
+                        ${matchRow}
+                        ${r.score !== 'N/A' ? `<p class="result-score">Score: ${r.score}</p>` : ''}
+                    </div>
+                </div>
+            `;
+        }).join('');
+    } catch (err) {
+        resultsContainer.innerHTML = '<div class="error">An error occurred during search. Please try again.</div>';
+    }
+}
+
+// ── Delete document ───────────────────────────────────────────────────────
+async function deleteDoc(docId) {
+    if (!confirm('Delete this document from the index?')) return;
+    try {
+        const res = await fetch(`/delete_document/${docId}`, { method: 'DELETE' });
+        const data = await res.json();
+        if (data.success) {
+            const card = document.getElementById(`doc-${docId}`);
+            if (card) {
+                card.style.transition = 'opacity 0.3s, transform 0.3s';
+                card.style.opacity = '0';
+                card.style.transform = 'translateX(20px)';
+                setTimeout(() => card.remove(), 300);
+            }
+            showToast('Document deleted.', 'success');
+        } else {
+            showToast(data.error || 'Could not delete.', 'error');
+        }
+    } catch {
+        showToast('Network error.', 'error');
+    }
+}
+
+// ── Add document modal ────────────────────────────────────────────────────
+function openModal() {
+    document.getElementById('addModal').style.display = 'flex';
+    document.getElementById('newTitle').focus();
+}
+function closeModal() {
+    document.getElementById('addModal').style.display = 'none';
+    document.getElementById('newTitle').value = '';
+    document.getElementById('newText').value  = '';
+    document.getElementById('newLang').value  = 'en';
+}
+function closeModalOnBackdrop(e) {
+    if (e.target === document.getElementById('addModal')) closeModal();
+}
+
+async function submitDoc() {
+    const title = document.getElementById('newTitle').value.trim();
+    const lang  = document.getElementById('newLang').value;
+    const text  = document.getElementById('newText').value.trim();
+
+    if (!title || !text) {
+        showToast('Please fill in both Title and Content.', 'error');
+        return;
+    }
+
+    try {
+        const res  = await fetch('/add_document', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ title, lang, text })
+        });
+        const data = await res.json();
+
+        if (data.success) {
+            showToast(`Document "${title}" added (ID: ${data.id}).`, 'success');
+            closeModal();
+            // Refresh current view
+            const q = document.getElementById('searchInput').value.trim();
+            if (q) performSearch(); else performSearch(true);
+        } else {
+            showToast(data.error || 'Could not add document.', 'error');
+        }
+    } catch {
+        showToast('Network error.', 'error');
+    }
+}
+
+// ── Toast helper ──────────────────────────────────────────────────────────
+function showToast(msg, type = 'success') {
+    const t = document.createElement('div');
+    t.className = `toast ${type}`;
+    t.textContent = msg;
+    document.body.appendChild(t);
+    setTimeout(() => {
+        t.style.transition = 'opacity 0.4s';
+        t.style.opacity = '0';
+        setTimeout(() => t.remove(), 400);
+    }, 3000);
+}
+
+// ── Wiktionary Integration ────────────────────────────────────────────────
+function escapeHtml(str) {
+    if (!str) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
+function escapeJs(str) {
+    if (!str) return '';
+    return String(str).replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '\\"');
+}
+
+function renderDefinitionHtml(data, isInline = false) {
+    const cacheBadge = data.cached
+        ? `<span class="definition-cache-badge" title="Retrieved instantly from in-memory LRU cache">⚡ LRU Cache (O(1))</span>`
+        : `<span class="definition-cache-badge" style="background:#ecfdf5;color:#065f46;" title="Fetched via Wiktionary REST API">🌐 Wiktionary API</span>`;
+
+    const closeBtn = isInline
+        ? `<button class="definition-close-btn" onclick="dismissInlineDefinition()" title="Dismiss definition">✕</button>`
+        : '';
+
+    let entriesHtml = '';
+    if (data.entries && data.entries.length > 0) {
+        entriesHtml = data.entries.map(entry => `
+            <div class="definition-entry">
+                <div class="definition-entry-meta">
+                    <span class="definition-pos">${escapeHtml(entry.part_of_speech || 'Definition')}</span>
+                    <span class="definition-lang-badge">• ${escapeHtml(entry.language)}</span>
+                </div>
+                <ol class="definition-list">
+                    ${entry.definitions.map(d => `<li>${escapeHtml(d)}</li>`).join('')}
+                </ol>
+            </div>
+        `).join('');
+    } else {
+        entriesHtml = `<p style="color:var(--text-muted);font-style:italic;margin:0.5rem 0;">No definition entries available.</p>`;
+    }
+
+    return `
+        <div class="definition-card">
+            <div class="definition-header">
+                <div class="definition-title-group">
+                    <h3 class="definition-word">📖 ${escapeHtml(data.word)}</h3>
+                    ${cacheBadge}
+                    <span class="definition-source-badge">Wiktionary</span>
+                </div>
+                <div class="definition-actions">
+                    <a href="${data.wiktionary_url || ('https://en.wiktionary.org/wiki/' + encodeURIComponent(data.word))}" 
+                       target="_blank" rel="noopener" class="definition-link">
+                        Wiktionary Page ↗
+                    </a>
+                    ${closeBtn}
+                </div>
+            </div>
+            <div class="definition-entries-container">
+                ${entriesHtml}
+            </div>
+        </div>
+    `;
+}
+
+async function fetchInlineDefinition(word, lang) {
+    const inlineBox = document.getElementById('inlineDefinitionBox');
+    if (!word) {
+        inlineBox.style.display = 'none';
+        return;
+    }
+
+    try {
+        const langParam = lang && lang !== 'all' ? `?lang=${encodeURIComponent(lang)}` : '';
+        const res = await fetch(`/api/define/${encodeURIComponent(word)}${langParam}`);
+        const data = await res.json();
+
+        if (data.found && data.entries && data.entries.length > 0) {
+            inlineBox.innerHTML = renderDefinitionHtml(data, true);
+            inlineBox.style.display = 'block';
+        } else {
+            inlineBox.style.display = 'none';
+            inlineBox.innerHTML = '';
+        }
+    } catch {
+        inlineBox.style.display = 'none';
+    }
+}
+
+function dismissInlineDefinition() {
+    const inlineBox = document.getElementById('inlineDefinitionBox');
+    inlineBox.style.display = 'none';
+    inlineBox.innerHTML = '';
+}
+
+function openDefineModal(initialWord = '', lang = 'all') {
+    const modal = document.getElementById('defineModal');
+    const input = document.getElementById('defineWordInput');
+    const select = document.getElementById('defineLangSelect');
+    const resultArea = document.getElementById('modalDefinitionResult');
+
+    modal.style.display = 'flex';
+    input.value = initialWord || '';
+    select.value = lang || 'all';
+    resultArea.innerHTML = '';
+
+    input.focus();
+    if (initialWord) {
+        lookupDefinitionModal();
+    }
+}
+
+function closeDefineModal() {
+    document.getElementById('defineModal').style.display = 'none';
+}
+
+function closeDefineModalOnBackdrop(e) {
+    if (e.target === document.getElementById('defineModal')) closeDefineModal();
+}
+
+function handleDefineKeyPress(e) {
+    if (e.key === 'Enter') lookupDefinitionModal();
+}
+
+async function lookupDefinitionModal() {
+    const word = document.getElementById('defineWordInput').value.trim();
+    const lang = document.getElementById('defineLangSelect').value;
+    const resultArea = document.getElementById('modalDefinitionResult');
+
+    if (!word) {
+        showToast('Please enter a word to define.', 'error');
+        return;
+    }
+
+    resultArea.innerHTML = '<div class="loading" style="padding:1.5rem 0;">Searching Wiktionary...</div>';
+
+    try {
+        const langParam = lang && lang !== 'all' ? `?lang=${encodeURIComponent(lang)}` : '';
+        const res = await fetch(`/api/define/${encodeURIComponent(word)}${langParam}`);
+        const data = await res.json();
+
+        if (data.found && data.entries && data.entries.length > 0) {
+            resultArea.innerHTML = renderDefinitionHtml(data, false);
+        } else {
+            resultArea.innerHTML = `
+                <div style="padding:1.5rem;text-align:center;color:var(--text-muted);background:#fafafa;border-radius:8px;border:1px solid #eee;">
+                    <p style="margin:0 0 0.5rem 0;font-weight:600;color:var(--text-main);">No definition found for "${escapeHtml(word)}"</p>
+                    <p style="font-size:0.88rem;margin:0;">Make sure the spelling is correct, or try selecting a different language edition.</p>
+                </div>
+            `;
+        }
+    } catch (err) {
+        resultArea.innerHTML = '<div class="error" style="padding:1.5rem 0;">Failed to fetch word meaning. Please check your connection.</div>';
+    }
+}
+
+function openDefineModalForTitle(rawTitle, lang) {
+    // Strip HTML tags and select first word of document title
+    const cleanText = rawTitle.replace(/<[^>]+>/g, '').trim();
+    const firstWord = cleanText.split(/\s+/)[0];
+    openDefineModal(firstWord, lang);
+}
+
+</script>
 </body>
 </html>

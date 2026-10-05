@@ -4,6 +4,8 @@ A web-based demo of a search engine implemented from scratch using classical Dat
 
 This project proves that classical DSA can achieve fast, multilingual, typo-tolerant search in a lightweight pipeline.
 
+> 📖 **Full System Context & DSA Guide**: See [`CONTEXT.md`](CONTEXT.md) for in-depth architecture diagrams, complete DSA maps with complexities, and API documentation.
+
 ## Features & Methodology
 
 The system is highly modular, breaking down the search pipeline into swappable components.
@@ -13,16 +15,21 @@ The system is highly modular, breaking down the search pipeline into swappable c
 - **Edit Distance Fallback (`modules/matcher.py`)**: If an exact match isn't found in the index, a Levenshtein dynamic programming algorithm (O(m*n)) fuzzy-matches the query against the vocabulary to find the closest match.
 - **TF-IDF Ranking (`modules/ranker.py`)**: Scores matching documents by evaluating term frequency and inverse document frequency, returning ranked top-k results.
 
-### 2. Adaptability (Swappable Tokenizer)
+### 2. Wiktionary Meaning-Based Semantic Retrieval & LRU Caching
+- **Meaning Search (`modules/wiktionary.py`)**: Seamlessly integrated with Wikimedia's Wiktionary API to search the *meaning* of words. When a user queries a term, the engine extracts definitions, direct glosses, root forms, and thesaurus synonyms, then retrieves all documents in any language that share that same meaning (e.g. searching *automobile* retrieves documents about *cars*; searching *receta* retrieves English *recipes*).
+- **LRU Cache ($O(1)$)**: Employs an in-memory Least Recently Used cache to memoize API responses, ensuring repeat lookups execute in $< 1\text{ ms}$.
+- **Interactive Meaning UI**: Displays a Wiktionary Meaning Search banner, visual tags indicating why a document was matched (`Matched Meaning: "recipe"`), and a dedicated "Define Word" lookup modal.
+
+### 3. Adaptability (Swappable Tokenizer)
 - **Tokenizer (`modules/tokenizer.py`)**: A language-agnostic tokenizer that uses Unicode-aware regex (`\w+` with `re.UNICODE`) to split words. Adding support for a new language requires **only** touching the tokenizer, completely decoupled from the indexer or matcher.
 
-### 3. Methodology Evaluation
+### 4. Methodology Evaluation
 - **Benchmark Route (`/benchmark`)**: An interactive evaluation page that measures empirical performance:
   - **Index Build Time**: Demonstrates time complexity as the corpus size grows.
   - **Query Latency**: A head-to-head performance comparison of the indexed lookup against a naive linear scan over the same corpus.
   - **Fuzzy-Match Accuracy**: Measures resolution accuracy on queries with deliberate typos.
 
-### 4. Accessibility
+### 5. Accessibility
 - No external NLP/ML dependencies.
 - Relies only on Flask for the web server, ensuring a single-command setup.
 
