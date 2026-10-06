@@ -469,27 +469,28 @@ synonym_graph.add_synonyms([
     'পৰিষ্কাৰ',                           # as
 ])
 
-# --- CAR ---
+# --- CAR / VEHICLE ---
 synonym_graph.add_synonyms([
-    'car', 'cars',                        # en
-    'coche', 'coches',                    # es
-    'voiture',                            # fr
-    'auto',                               # de/pt
-    'سيارة',                              # ar
-    '汽车', '车',                          # zh
-    'कार',                               # hi
-    'গাড়ি',                              # bn
-    'కారు',                              # te
-    'कार',                               # mr
-    'கார்',                               # ta
-    'گاڑی',                               # ur
-    'કાર',                               # gu
-    'ಕಾರ್',                              # kn
-    'കാർ',                               # ml
-    'ଗାଡ଼ି',                              # or
-    'ਕਾਰ',                               # pa
-    'গাড়ী',                               # as
+    'car', 'cars', 'van', 'vans', 'vehicle', 'vehicles', 'automobile', 'auto', # en
+    'coche', 'coches', 'vehículo', 'furgoneta',   # es
+    'voiture', 'véhicule', 'camionnette',         # fr
+    'auto', 'fahrzeug', 'lieferwagen',            # de/pt
+    'سيارة', 'مركبة',                              # ar
+    '汽车', '车', '车辆',                           # zh
+    'कार', 'गाड़ी', 'वाहन',                        # hi
+    'গাড়ি', 'যানবাহন',                            # bn
+    'కారు', 'వాహనం',                              # te
+    'कार', 'गाडी', 'वाहन',                        # mr
+    'கார்', 'வாகனம்',                             # ta
+    'گاڑی', 'گاڑیاں',                              # ur
+    'કાર', 'વાહન',                               # gu
+    'ಕಾರ್', 'ವಾಹನ',                               # kn
+    'കാർ', 'വാഹനം',                              # ml
+    'ଗାଡ଼ି', 'ଯାନ',                                # or
+    'ਕਾਰ', 'ਗੱਡੀ',                                # pa
+    'গাড়ী', 'বাহন',                               # as
 ])
+
 
 # --- PARIS ---
 synonym_graph.add_synonyms([
@@ -613,3 +614,194 @@ synonym_graph.add_synonyms([
     'নমস্কাৰ',                                      # as
     'नमस्ते', 'नमस्कारः',                           # sa
 ])
+
+# --- MAN / MEN ---
+synonym_graph.add_synonyms([
+    'man', 'men', 'male', 'gentleman',               # en
+    'hombre', 'hombres', 'masculina',                # es
+    'homme', 'hommes',                               # fr
+    'mann', 'männer',                                # de
+    'homem', 'homens',                               # pt
+    'رجل', 'رجال',                                   # ar
+    '男人', '男士',                                   # zh
+    'पुरुष', 'पुरुषों', 'आदमी',                      # hi
+    'পুরুষ', 'মানুষ',                                # bn
+    'పురుషుడు', 'పురుషులు',                          # te
+    'पुरुष', 'माणूस',                                # mr
+    'ஆண்', 'மனிதன்',                                 # ta
+    'مرد', 'آدمی',                                   # ur
+    'પુરુષ', 'માણસ',                                 # gu
+    'ಪುರುಷ', 'ಮನುಷ್ಯ',                               # kn
+    'പുരുഷൻ',                                       # ml
+    'ପୁରୁଷ',                                         # or
+    'ਪੁਰਖ', 'ਆਦਮੀ',                                  # pa
+    'পুৰুষ',                                         # as
+    'पुरुषः',                                        # sa
+])
+
+# --- PET / PETS ---
+synonym_graph.add_synonyms([
+    'pet', 'pets',                                   # en
+    'mascota', 'mascotas',                           # es
+    'animal', 'animaux',                             # fr
+    'haustier', 'haustiere',                         # de
+    'mascote', 'mascotes',                           # pt
+    'حيوان', 'أليف',                                 # ar
+    '宠物',                                          # zh
+    'पालतू',                                         # hi
+    'পোষা',                                          # bn
+    'పెంపుడు',                                       # te
+    'पाळीव',                                         # mr
+    'செல்லப்பிராணி',                                 # ta
+    'پالتو',                                         # ur
+    'પાલતુ',                                         # gu
+    'ಸಾಕುಪ್ರಾಣಿ',                                   # kn
+    'വളർത്തുമൃഗം',                                   # ml
+    'ਪਾਲਤੂ',                                         # pa
+    'পোহনীয়া',                                       # as
+])
+
+# --- DIFFICULT / HARD / COMPLICATED ---
+synonym_graph.add_synonyms([
+    'difficult', 'hard', 'tough', 'complicated',     # en
+    'difícil', 'dificil', 'complejo',                # es
+    'difficile', 'compliqué',                        # fr
+    'schwierig', 'schwer',                           # de
+    'difícil', 'dificil',                            # pt
+    'صعب', 'معقد',                                   # ar
+    '困难', '难',                                    # zh
+    'मुश्किल', 'कठिन',                               # hi
+    'কঠিন', 'মুশকিল',                                # bn
+    'కష్టమైన', 'కష్టం',                              # te
+    'कठीण', 'अवघड',                                  # mr
+    'கடினம்', 'கடினமான',                             # ta
+    'مشکل', 'کٹھن',                                  # ur
+    'મુશ્કેલ', 'કઠિન',                               # gu
+    'ಕಷ್ಟ', 'ಕಠಿಣ',                                  # kn
+    'ബുദ്ധിമുട്ടുള്ള', 'പ്രയാസമുള്ള',                 # ml
+    'କଠିନ', 'ମୁସ୍କିଲ',                               # or
+    'ਔਖਾ', 'ਮੁਸ਼ਕਿਲ',                                 # pa
+    'কঠিন', 'টান',                                   # as
+    'कठिनम्', 'दुरूहम्',                             # sa
+])
+
+# --- EASY / SIMPLE ---
+synonym_graph.add_synonyms([
+    'easy', 'simple',                                # en
+    'fácil', 'facil', 'sencillo',                    # es
+    'facile', 'simple',                              # fr
+    'einfach', 'leicht',                             # de
+    'fácil', 'facil', 'simples',                     # pt
+    'سهل', 'بسيط',                                   # ar
+    '容易', '简单',                                   # zh
+    'आसान', 'सरल',                                   # hi
+    'সহজ', 'সরল',                                    # bn
+    'సులభం', 'సులువు',                               # te
+    'सोपे', 'सरळ',                                   # mr
+    'எளிதான', 'சுலபமான',                             # ta
+    'آسان', 'سہل',                                   # ur
+    'સરળ', 'સહેલું',                                 # gu
+    'ಸುಲಭ', 'ಸರಳ',                                   # kn
+    'ലളിതമായ', 'എളുപ്പമുള്ള',                         # ml
+    'ସହଜ', 'ସରଳ',                                    # or
+    'ਸੌਖਾ', 'ਸਰਲ',                                   # pa
+    'সহজ', 'সৰল',                                    # as
+    'सरलम्', 'सुकरम्',                               # sa
+])
+
+# --- STORY / TALE ---
+synonym_graph.add_synonyms([
+    'story', 'tale', 'narrative',                    # en
+    'cuento', 'historia', 'relato',                  # es
+    'histoire', 'conte',                             # fr
+    'geschichte', 'erzählung',                       # de
+    'história', 'conto',                             # pt
+    'قصة', 'رواية',                                  # ar
+    '故事', '童话',                                   # zh
+    'कहानी', 'कथा', 'किस्सा',                        # hi
+    'গল্প', 'কাহিনী',                                 # bn
+    'కథ', 'గాథ',                                     # te
+    'गोष्ट', 'कथा',                                  # mr
+    'கதை', 'சிறுகதை',                                # ta
+    'کہانی', 'قصہ',                                  # ur
+    'વાર્તા', 'કથા',                                 # gu
+    'ಕಥೆ', 'ಗಾಥೆ',                                   # kn
+    'കഥ', 'ചരിത്രം',                                 # ml
+    'ଗଳ୍ପ', 'କାହାଣୀ',                                 # or
+    'ਕਹਾਣੀ', 'ਗਾਥਾ',                                 # pa
+    'কাহিনী', 'সাধুকথা',                              # as
+    'कथा', 'आख्यायिका',                              # sa
+])
+
+# --- SUCCESS / VICTORY ---
+synonym_graph.add_synonyms([
+    'success', 'victory', 'achievement',             # en
+    'éxito', 'exito', 'victoria',                    # es
+    'succès', 'victoire',                            # fr
+    'erfolg', 'sieg',                                # de
+    'sucesso', 'vitória',                            # pt
+    'نجاح', 'فوز',                                   # ar
+    '成功', '胜利',                                   # zh
+    'सफलता', 'कामयाबी', 'विजय',                      # hi
+    'সফলতা', 'সাফল্য', 'বিজয়',                      # bn
+    'విజయం', 'సఫలత',                                 # te
+    'यश', 'सफलता',                                   # mr
+    'வெற்றி', 'சாதிப்பு',                            # ta
+    'کامیابی', 'فتح',                                 # ur
+    'સફળતા', 'વિજય',                                 # gu
+    'ಯಶಸ್ಸು', 'ವಿಜಯ',                                # kn
+    'വിജയം', 'വിജയശ്രീ',                             # ml
+    'ସଫଳତା', 'ବିଜୟ',                                 # or
+    'ਸਫਲਤਾ', 'ਜਿੱਤ',                                 # pa
+    'সাফল্য', 'বিজয়',                                 # as
+    'सफलता', 'विजयः',                                # sa
+])
+
+# --- STUDENT / LEARNER ---
+synonym_graph.add_synonyms([
+    'student', 'pupil', 'learner',                   # en
+    'estudiante', 'alumno',                          # es
+    'étudiant', 'élève',                             # fr
+    'schüler', 'student',                            # de
+    'estudante', 'aluno',                            # pt
+    'طالب', 'تلميذ',                                 # ar
+    '学生', '学员',                                   # zh
+    'छात्र', 'विद्यार्थी', 'शिष्य',                 # hi
+    'ছাত্র', 'শিক্ষার্থী',                            # bn
+    'విద్యార్థి', 'శిష్యుడు',                         # te
+    'विद्यार्थी', 'छात्र',                           # mr
+    'மாணவர்', 'மாணவன்',                              # ta
+    'طالب', 'شاگرد',                                 # ur
+    'વિદ્યાર્થી', 'શિષ્ય',                           # gu
+    'ವಿದ್ಯಾರ್ಥಿ', 'ಶಿಷ್ಯ',                           # kn
+    'വിദ്യാർത്ഥി', 'ശിഷ്യൻ',                         # ml
+    'ଛାତ୍ର', 'ବିଦ୍ୟାର୍ଥୀ',                            # or
+    'ਵਿਦਿਆਰਥੀ', 'ਚੇਲਾ',                              # pa
+    'ছাত্ৰ', 'শিক্ষাৰ্থী',                            # as
+    'छात्रः', 'विद्यार्थी',                          # sa
+])
+
+# --- TEACHER / MENTOR ---
+synonym_graph.add_synonyms([
+    'teacher', 'mentor', 'instructor', 'educator',   # en
+    'profesor', 'maestro', 'mentor',                 # es
+    'professeur', 'enseignant',                      # fr
+    'lehrer', 'dozent',                              # de
+    'professor', 'mestre',                           # pt
+    'معلم', 'أستاذ',                                 # ar
+    '老师', '教师',                                   # zh
+    'शिक्षक', 'अध्यापक', 'गुरु',                     # hi
+    'শিক্ষক', 'গুরু',                                # bn
+    'గురువు', 'ఉపాధ్యాయుడు',                         # te
+    'शिक्षक', 'गुरुजी',                              # mr
+    'ஆசிரியர்', 'குரு',                               # ta
+    'استاد', 'معلم',                                 # ur
+    'શિક્ષક', 'ગુરુ',                                 # gu
+    'ಶಿಕ್ಷಕ', 'ಗುರು',                                # kn
+    'അധ്യാപകൻ', 'ഗുരു',                              # ml
+    'ଶିକ୍ଷକ', 'ଗୁରୁ',                                # or
+    'ਅਧਿਆਪਕ', 'ਗੁਰੂ',                                # pa
+    'শিক্ষক', 'গুৰু',                                # as
+    'गुरुः', 'उपाध्यायः',                            # sa
+])
+

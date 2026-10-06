@@ -18,30 +18,62 @@ def edit_distance(word1, word2):
                 cost = 0
             else:
                 cost = 1
-            dp[i][j] = min(dp[i - 1][j] + 1,      # Deletion
-                           dp[i][j - 1] + 1,      # Insertion
-                           dp[i - 1][j - 1] + cost) # Substitution
+            dp[i][j] = min(dp[i - 1][j] + 1,          # Deletion
+                           dp[i][j - 1] + 1,          # Insertion
+                           dp[i - 1][j - 1] + cost)   # Substitution
     return dp[m][n]
 
-def find_closest_word(word, vocabulary_words, max_distance=2):
+
+def get_max_allowed_distance(word: str) -> int:
+    """
+    Computes the maximum permissible edit distance based on word length.
+    Prevents short words (<= 3 chars like 'van', 'man', 'cat', 'car', 'dog', 'pen')
+    from mutating into completely different words!
+    
+    Rule:
+    - len <= 3: 0 edits (exact match only; 1-letter change completely changes word meaning!)
+    - len 4..5: max 1 edit (e.g. 'paela' -> 'paella', 'cooke' -> 'cookie')
+    - len >= 6: max 2 edits (e.g. 'receipe' -> 'recipe', 'tecnologia' -> 'tecnología')
+    """
+    length = len(word.strip())
+    if length <= 3:
+        return 0
+    elif length <= 5:
+        return 1
+    else:
+        return 2
+
+
+def find_closest_word(word, vocabulary_words, max_distance=None):
     """
     O(V * m * n) time complexity where V is vocabulary size, 
     m is length of the query word, and n is average vocabulary word length.
+    Uses length-based adaptive distance thresholds to prevent false positives on short words.
     """
+    allowed_by_len = get_max_allowed_distance(word)
+    if max_distance is None:
+        effective_max = allowed_by_len
+    else:
+        effective_max = min(max_distance, allowed_by_len)
+
+    if effective_max <= 0:
+        return None
+
     best_word = None
     min_dist = float('inf')
     
     for vocab_word in vocabulary_words:
-        # Optimization: if length difference is greater than max_distance, skip
-        if abs(len(word) - len(vocab_word)) > max_distance:
+        # Optimization: if length difference is greater than effective_max, skip
+        if abs(len(word) - len(vocab_word)) > effective_max:
             continue
             
         dist = edit_distance(word, vocab_word)
-        if dist <= max_distance and dist < min_dist:
+        if dist <= effective_max and dist < min_dist:
             min_dist = dist
             best_word = vocab_word
             
     return best_word
+
 
 def get_dp_matrix_details(word1, word2):
     """
@@ -121,4 +153,3 @@ def get_dp_matrix_details(word1, word2):
         "path": path,
         "operations": operations
     }
-

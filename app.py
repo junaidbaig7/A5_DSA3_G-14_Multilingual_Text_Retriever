@@ -172,11 +172,14 @@ def search():
         for term in raw_terms:
             if term in global_index.index:
                 resolved_search_terms.append(term)
+            elif term in synonym_graph.adj:
+                # Term is a verified valid word across our 20-language synonym graph
+                resolved_search_terms.append(term)
             elif use_fuzzy:
                 # Count length pruning skipped
                 pruned_comparisons += sum(1 for v in vocab_keys if abs(len(term) - len(v)) > 2)
-                closest = find_closest_word(term, vocab_keys, max_distance=2)
-                if closest:
+                closest = find_closest_word(term, vocab_keys)
+                if closest and closest != term:
                     resolved_search_terms.append(closest)
                     dist = edit_distance(term, closest)
                     corrections[term] = {'target': closest, 'distance': dist}
@@ -210,8 +213,8 @@ def search():
 
                     matched_words_for_term = []
                     for cand in m_info.get('all_meaning_terms', []):
-                        # Retain candidate words that exist in our index or are in our synonym graph
-                        if cand in global_index.index or synonym_graph.get_synonyms(cand):
+                        # Retain candidate words that genuinely exist in our document index
+                        if cand in global_index.index:
                             if cand not in resolved_search_terms and cand not in matched_words_for_term:
                                 matched_words_for_term.append(cand)
 
@@ -235,9 +238,8 @@ def search():
                 term_weights[mt] = 0.80
 
         if use_synonyms:
-            # Expand both resolved search terms and high-confidence meaning terms
-            expansion_seeds = list(resolved_search_terms) + [mt for mt in wiktionary_meaning_terms if mt in global_index.index]
-            for term in expansion_seeds:
+            # Expand ONLY resolved search terms (DO NOT expand meaning terms into the synonym graph to prevent domain drift!)
+            for term in resolved_search_terms:
                 syns = synonym_graph.get_synonyms(term)
                 indexed_syns = [s for s in syns if s in global_index.index and s not in ranking_terms]
                 for s in indexed_syns:

@@ -93,10 +93,6 @@ def lookup_word(word: str, preferred_lang: str = None) -> dict:
        https://{preferred_lang}.wiktionary.org/api/rest_v1/page/definition/{word}.
     4. Cleans HTML tags into formatted plain text definitions.
     5. Saves result in LRU Cache.
-    
-    :param word: The term to look up.
-    :param preferred_lang: Optional ISO language code (e.g. 'en', 'es', 'hi') to prioritize.
-    :return: Formatted dictionary containing word meanings or error status.
     """
     word = (word or '').strip()
     if not word:
@@ -131,10 +127,8 @@ def lookup_word(word: str, preferred_lang: str = None) -> dict:
         except urllib.error.HTTPError as e:
             if e.code == 404:
                 continue
-            # For other HTTP errors, continue checking fallback
             continue
         except Exception:
-            # Timeouts or network issues
             continue
 
     if not raw_data or not isinstance(raw_data, dict):
@@ -149,7 +143,6 @@ def lookup_word(word: str, preferred_lang: str = None) -> dict:
 
     # Parse and structure the definitions
     parsed_entries = []
-    # If a preferred_lang is given, order it first if available
     lang_keys = list(raw_data.keys())
     if preferred_lang and preferred_lang in lang_keys:
         lang_keys.remove(preferred_lang)
@@ -204,7 +197,7 @@ def lookup_word(word: str, preferred_lang: str = None) -> dict:
 
 
 # ---------------------------------------------------------------------------
-# Meaning-Based Semantic Expansion Helpers
+# Strict Semantic Meaning Filters & Stopwords
 # ---------------------------------------------------------------------------
 
 DEFINITION_STOPWORDS = {
@@ -221,17 +214,26 @@ DEFINITION_STOPWORDS = {
     'who', 'when', 'where', 'why', 'how', 'all', 'both', 'each', 'few', 'own', 'same',
     'so', 'too', 'just', 'now', 'form', 'person', 'tense', 'definite', 'indefinite',
     'sense', 'referring', 'pertaining', 'relating', 'consisting', 'containing', 'characterized',
-    # Conversational & common generic words that corrupt search when extracted from definitions:
     'you', 'your', 'yours', 'me', 'my', 'mine', 'we', 'us', 'our', 'ours', 'he', 'him', 'his',
     'she', 'her', 'hers', 'they', 'theirs',
     'day', 'days', 'night', 'morning', 'evening', 'time', 'times', 'life', 'year', 'years',
     'good', 'bad', 'top', 'bottom', 'side', 'page', 'said', 'say', 'saying', 'tell', 'ask',
-    'well', 'way', 'ways', 'man', 'men', 'woman', 'women', 'new', 'old', 'get', 'gets',
+    'well', 'way', 'ways', 'new', 'old', 'get', 'gets',
     'take', 'takes', 'make', 'makes', 'see', 'look', 'know', 'think', 'come', 'go', 'give',
     'someone', 'somebody', 'anyone', 'anybody', 'everyone', 'something', 'anything', 'nothing',
     'like', 'such', 'called', 'name', 'named', 'state', 'action', 'process', 'manner', 'quality',
     'order', 'part', 'piece', 'unit', 'kind', 'class', 'group', 'number', 'amount', 'degree',
     'word', 'words', 'test', 'tests', 'text', 'line', 'item', 'example', 'case', 'thing', 'things'
+}
+
+# Strict blocklist against informal slang, metaphors, animals applied to humans, and offensive terms
+# that crowdsourced wiki pages often inappropriately cross-link.
+DISALLOWED_METAPHOR_SLANG = {
+    'cat', 'cats', 'dog', 'dogs', 'dawg', 'rooster', 'stud', 'bloke', 'boy', 'kid',
+    'bird', 'birds', 'chick', 'doll', 'pig', 'pigs', 'shark', 'sharks', 'rat', 'rats',
+    'snake', 'beast', 'tool', 'nut', 'clown', 'turkey', 'donkey', 'jackass', 'dude',
+    'bro', 'bruh', 'broski', 'fella', 'guy', 'chap', 'cove', 'covey', 'gadgie', 'geezer',
+    'nigga', 'nigger', 'bitch', 'whore', 'slut', 'bastard', 'asshole', 'fuck', 'shit'
 }
 
 SUPPORTED_LANG_NAMES = {
@@ -243,15 +245,18 @@ SUPPORTED_LANG_NAMES = {
 
 def get_wiktionary_synonyms(word: str) -> list:
     """
-    Fetches direct single-word synonyms from Wiktionary Thesaurus and page wikitext.
-    Caches results in _wiktionary_cache for O(1) repeat queries.
-    Multi-word phrases and common stop words are strictly excluded.
+    Fetches strict, high-confidence single-word synonyms directly from the main entry's
+    {{syn|...}} or {{synonyms|...}} definitions on Wiktionary.
+    
+    NOTE: We explicitly DO NOT query Wiktionary 'Thesaurus:<word>' pages because they are
+    crowdsourced dumps of street slang, insults, and metaphors (e.g. associating 'cat' or 'dog' with 'man')
+    which pollute search results and corrupt semantic meaning.
     """
     word = (word or '').strip().lower()
-    if not word:
+    if not word or len(word) < 3:
         return []
 
-    cache_key = f"__synonyms_clean__::{word}"
+    cache_key = f"__synonyms_clean_strict__::{word}"
     cached = _wiktionary_cache.get(cache_key)
     if cached is not None:
         return list(cached)
@@ -262,43 +267,87 @@ def get_wiktionary_synonyms(word: str) -> list:
         'User-Agent': 'MultilingualRetriever/1.0 (Educational DSA Project; contact: student@project.local)'
     }
 
-    # 1. Check Wiktionary Thesaurus entry: Thesaurus:<word>
-    url_thesaurus = f"https://en.wiktionary.org/w/api.php?action=parse&page=Thesaurus:{encoded}&prop=wikitext&format=json"
+    url_page = f"https://en.wiktionary.org/w/api.php?action=parse&page={encoded}&prop=wikitext&format=json"
     try:
-        req = urllib.request.Request(url_thesaurus, headers=headers)
+        req = urllib.request.Request(url_page, headers=headers)
         with urllib.request.urlopen(req, timeout=3) as resp:
             data = json.loads(resp.read().decode('utf-8'))
             wt = data.get('parse', {}).get('wikitext', {}).get('*', '')
-            raw_matches = re.findall(r'\{\{(?:ws|l)\|[a-z]{2,3}\|([^}|]+)', wt)
-            for m in raw_matches:
-                clean_m = re.sub(r'<[^>]+>', '', m).strip().lower()
-                # Strict validation: single words only (no multi-word phrases), non-stopwords, len > 2
-                if ' ' not in clean_m and clean_m != word and clean_m not in synonyms and len(clean_m) > 2:
-                    if clean_m not in DEFINITION_STOPWORDS:
-                        synonyms.append(clean_m)
+            # Match explicit {{syn|en|word1|word2}} or {{synonyms|en|word1|word2}}
+            for m in re.finditer(r'\{\{syn(?:onyms)?\|[a-z]{2,3}\|([^}]+)\}\}', wt):
+                for piece in m.group(1).split('|'):
+                    p = piece.split('=')[-1].strip().lower()
+                    clean_p = re.sub(r'<[^>]+>', '', p).strip().lower()
+                    if (
+                        ' ' not in clean_p and
+                        clean_p != word and
+                        not clean_p.startswith('thesaurus:') and
+                        len(clean_p) > 2 and
+                        clean_p not in synonyms and
+                        clean_p not in DEFINITION_STOPWORDS and
+                        clean_p not in DISALLOWED_METAPHOR_SLANG
+                    ):
+                        synonyms.append(clean_p)
     except Exception:
         pass
 
-    # 2. Check main page {{syn|...}} or {{synonyms|...}} templates if few thesaurus entries
-    if len(synonyms) < 3:
-        url_page = f"https://en.wiktionary.org/w/api.php?action=parse&page={encoded}&prop=wikitext&format=json"
-        try:
-            req = urllib.request.Request(url_page, headers=headers)
-            with urllib.request.urlopen(req, timeout=3) as resp:
-                data = json.loads(resp.read().decode('utf-8'))
-                wt = data.get('parse', {}).get('wikitext', {}).get('*', '')
-                for m in re.finditer(r'\{\{syn(?:onyms)?\|[a-z]{2,3}\|([^}]+)\}\}', wt):
-                    for piece in m.group(1).split('|'):
-                        p = piece.split('=')[-1].strip().lower()
-                        clean_p = re.sub(r'<[^>]+>', '', p).strip().lower()
-                        if ' ' not in clean_p and clean_p != word and not clean_p.startswith('thesaurus:') and clean_p not in synonyms and len(clean_p) > 2:
-                            if clean_p not in DEFINITION_STOPWORDS:
-                                synonyms.append(clean_p)
-        except Exception:
-            pass
+    _wiktionary_cache.put(cache_key, synonyms[:8])
+    return synonyms[:8]
 
-    _wiktionary_cache.put(cache_key, synonyms)
-    return synonyms
+
+SUPPORTED_LANG_CODES = {
+    'en', 'es', 'fr', 'de', 'pt', 'ar', 'zh',
+    'hi', 'bn', 'te', 'mr', 'ta', 'ur', 'gu', 'kn', 'ml', 'or', 'pa', 'as', 'sa'
+}
+
+
+def get_wiktionary_translations(word: str) -> list:
+    """
+    Extracts direct translation terms from Wiktionary's {{t|...}} or {{t+|...}}
+    tables across the 20 supported languages (e.g. difficult -> मुश्किल, कठिन, difícil, difficile, schwierig).
+    Uses O(1) LRU caching.
+    """
+    word = (word or '').strip().lower()
+    if not word or len(word) < 2:
+        return []
+
+    cache_key = f"__translations_clean__::{word}"
+    cached = _wiktionary_cache.get(cache_key)
+    if cached is not None:
+        return list(cached)
+
+    translations = []
+    encoded = urllib.parse.quote(word)
+    headers = {
+        'User-Agent': 'MultilingualRetriever/1.0 (Educational DSA Project; contact: student@project.local)'
+    }
+
+    url_page = f"https://en.wiktionary.org/w/api.php?action=parse&page={encoded}&prop=wikitext&format=json"
+    try:
+        req = urllib.request.Request(url_page, headers=headers)
+        with urllib.request.urlopen(req, timeout=3) as resp:
+            data = json.loads(resp.read().decode('utf-8'))
+            wt = data.get('parse', {}).get('wikitext', {}).get('*', '')
+            # Match standard translation templates: {{t|hi|मुश्किल}} or {{t+|es|difícil}}
+            for m in re.finditer(r'\{\{t[+\-]?\|([a-z]{2,3})\|([^}|]+)', wt):
+                lang_code = m.group(1).lower()
+                term = m.group(2).strip()
+                if lang_code in SUPPORTED_LANG_CODES:
+                    clean_term = re.sub(r'<[^>]+>', '', term).strip().lower()
+                    if (
+                        clean_term and
+                        clean_term != word and
+                        clean_term not in translations and
+                        clean_term not in DEFINITION_STOPWORDS and
+                        clean_term not in DISALLOWED_METAPHOR_SLANG and
+                        len(clean_term) > 1
+                    ):
+                        translations.append(clean_term)
+    except Exception:
+        pass
+
+    _wiktionary_cache.put(cache_key, translations[:20])
+    return translations[:20]
 
 
 def extract_meaning_expansion(word: str, preferred_lang: str = None) -> dict:
@@ -307,9 +356,9 @@ def extract_meaning_expansion(word: str, preferred_lang: str = None) -> dict:
     - Primary definition summary for user display.
     - Direct glosses (translation equivalents in foreign definitions, e.g., 'receta' -> 'recipe', 'agua' -> 'water').
     - Inflection roots (e.g. 'viajar' from 'inflection of viajar').
-    - Single-word synonyms from Wiktionary Thesaurus (e.g. 'automobile' -> 'car', 'auto').
+    - Strict, curated single-word synonyms (e.g. 'automobile' -> 'car').
     
-    Excludes descriptive paragraph keywords to prevent search pollution.
+    Excludes descriptive paragraph keywords, informal slang, and cross-category metaphors.
     Returns structured dictionary with word meaning and all expanded terms.
     """
     clean_word = (word or '').strip().lower()
@@ -360,7 +409,13 @@ def extract_meaning_expansion(word: str, preferred_lang: str = None) -> dict:
             if root_match:
                 root = root_match.group(1).strip().lower()
                 clean_root = re.sub(r'<[^>]+>', '', root).strip()
-                if clean_root and clean_root != clean_word and clean_root not in inflection_roots and clean_root not in DEFINITION_STOPWORDS:
+                if (
+                    clean_root and
+                    clean_root != clean_word and
+                    clean_root not in inflection_roots and
+                    clean_root not in DEFINITION_STOPWORDS and
+                    clean_root not in DISALLOWED_METAPHOR_SLANG
+                ):
                     inflection_roots.append(clean_root)
 
             # If this is purely a grammatical inflection line, skip setting as summary if we have better
@@ -371,31 +426,42 @@ def extract_meaning_expansion(word: str, preferred_lang: str = None) -> dict:
                 summary_def = d
 
             # Extract direct leading gloss before punctuation / parentheses:
-            # Foreign definitions typically start with 1-2 translation equivalents, e.g.:
+            # Foreign definitions typically start with 1-2 direct translation equivalents, e.g.:
             # "recipe (instructions for cooking food)" -> "recipe"
             # "water" -> "water"
             # "journey, trip" -> "journey", "trip"
             lead = re.split(r'[\(;:]', d)[0].strip()
             for part in re.split(r'[,/]', lead)[:2]:
                 toks = tokenize(part)
-                # Keep ONLY clean single headwords (never long phrases)
+                # Keep ONLY clean single headwords (never multi-word sentences)
                 if len(toks) == 1:
                     tok = toks[0]
-                    if tok not in DEFINITION_STOPWORDS and len(tok) > 2 and tok != clean_word:
+                    if (
+                        tok not in DEFINITION_STOPWORDS and
+                        tok not in DISALLOWED_METAPHOR_SLANG and
+                        len(tok) > 2 and
+                        tok != clean_word
+                    ):
                         if tok not in direct_glosses:
                             direct_glosses.append(tok)
 
-    # Fetch high-confidence single-word synonyms from Wiktionary Thesaurus
-    thesaurus_syns = get_wiktionary_synonyms(clean_word)
+    # Fetch strict synonyms (strictly excludes Thesaurus slang/metaphors)
+    strict_syns = get_wiktionary_synonyms(clean_word)
+
+    # Fetch cross-lingual translations across the 20 supported languages
+    translations = get_wiktionary_translations(clean_word)
 
     # Consolidate candidate meaning terms:
-    # 1. Direct glosses (translation equivalents from foreign words)
-    # 2. Inflection roots (e.g. viajar from viajes)
-    # 3. Direct single-word thesaurus synonyms (e.g. car, auto from automobile)
     combined = []
-    for t in direct_glosses + inflection_roots + thesaurus_syns:
+    for t in direct_glosses + inflection_roots + strict_syns + translations:
         t_clean = t.strip().lower()
-        if ' ' not in t_clean and t_clean not in DEFINITION_STOPWORDS and len(t_clean) > 2 and t_clean != clean_word:
+        if (
+            ' ' not in t_clean and
+            t_clean not in DEFINITION_STOPWORDS and
+            t_clean not in DISALLOWED_METAPHOR_SLANG and
+            len(t_clean) > 1 and
+            t_clean != clean_word
+        ):
             if t_clean not in combined:
                 combined.append(t_clean)
 
@@ -405,7 +471,8 @@ def extract_meaning_expansion(word: str, preferred_lang: str = None) -> dict:
         'summary_definition': summary_def,
         'direct_glosses': direct_glosses,
         'inflection_roots': inflection_roots,
-        'thesaurus_synonyms': thesaurus_syns[:10],
+        'thesaurus_synonyms': strict_syns[:6],
+        'translations': translations[:15],
         'all_meaning_terms': combined,
         'wiktionary_url': res.get('wiktionary_url', f"https://en.wiktionary.org/wiki/{clean_word}"),
         'cached': res.get('cached', False)
