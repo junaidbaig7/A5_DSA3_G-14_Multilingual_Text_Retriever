@@ -7,14 +7,21 @@ from modules.index import InvertedIndex
 from modules.matcher import find_closest_word, edit_distance, get_dp_matrix_details
 from modules.ranker import rank_documents, rank_documents_with_breakdown
 from modules.synonyms import synonym_graph
+from modules.semantic import MeaningGraph, SemanticLinker
 
-from modules.wiktionary import lookup_word, get_wiktionary_cache_stats, extract_meaning_expansion
+from modules.wiktionary import lookup_word, get_wiktionary_cache_stats
 import re
 
 
 app = Flask(__name__)
 
 CORPUS_PATH = os.path.join(os.path.dirname(__file__), 'data', 'corpus.json')
+# Learned meaning links persist across restarts (derived data, git-ignored). Tests/audits redirect it.
+SEMANTIC_STORE_PATH = os.environ.get('SEMANTIC_STORE_PATH') or os.path.join(
+    os.path.dirname(__file__), 'data', 'semantic_links.json')
+
+meaning_graph = MeaningGraph(SEMANTIC_STORE_PATH)
+semantic_linker = SemanticLinker(meaning_graph)
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -150,6 +157,7 @@ def search():
         meaning_definitions = []
         wiktionary_meaning_terms = []
         meaning_expansions_by_word = {}
+        meaning_nodes = {}
         execution_trace = {
             'mode': 'browse',
             'total_docs': global_index.total_docs,
@@ -175,6 +183,10 @@ def search():
             elif term in synonym_graph.adj:
                 # Term is a verified valid word across our 20-language synonym graph
                 resolved_search_terms.append(term)
+            elif use_meaning and meaning_graph.is_known_word(term):
+                # The dictionary identified this word when documents were linked (e.g. 'kitten' as the lemma of
+                # an indexed 'kittens'): it is a real word that merely is not an index token, so never "correct" it
+                resolved_search_terms.append(term)
             elif use_fuzzy:
                 # Count length pruning skipped
                 pruned_comparisons += sum(1 for v in vocab_keys if abs(len(term) - len(v)) > 2)
@@ -189,40 +201,28 @@ def search():
                 resolved_search_terms.append(term)
         s2_time = round((time.time() - s2_start) * 1000, 3)
 
-        # Stage 3: Wiktionary Meaning Retrieval & Semantic Expansion (O(1) LRU Cache + REST API)
+        # Stage 3: Meaning Graph Expansion. Words of every indexed document were linked to their lemma /
+        # translations when the document was added (modules/semantic.py); here the query word is resolved
+        # the same way (Wiktionary + O(1) LRU cache) and a 0-1 BFS finds every indexed word that shares its meaning.
         s3_meaning_start = time.time()
         meaning_definitions = []
         wiktionary_meaning_terms = []
         meaning_expansions_by_word = {}
-        meaning_cache_hits = 0
+        meaning_nodes = {}
+        meaning_store_hits = 0
 
         if use_meaning:
-            for term in resolved_search_terms:
-                m_info = extract_meaning_expansion(term, preferred_lang=lang_filter if lang_filter != 'all' else None)
-                if m_info.get('found'):
-                    if m_info.get('cached'):
-                        meaning_cache_hits += 1
-                    if m_info.get('summary_definition'):
-                        meaning_definitions.append({
-                            'word': term,
-                            'summary': m_info['summary_definition'],
-                            'direct_glosses': m_info.get('direct_glosses', []),
-                            'thesaurus_synonyms': m_info.get('thesaurus_synonyms', []),
-                            'wiktionary_url': m_info.get('wiktionary_url')
-                        })
-
-                    matched_words_for_term = []
-                    for cand in m_info.get('all_meaning_terms', []):
-                        # Retain candidate words that genuinely exist in our document index
-                        if cand in global_index.index:
-                            if cand not in resolved_search_terms and cand not in matched_words_for_term:
-                                matched_words_for_term.append(cand)
-
-                    if matched_words_for_term:
-                        meaning_expansions_by_word[term] = matched_words_for_term
-                        for w in matched_words_for_term:
-                            if w not in wiktionary_meaning_terms:
-                                wiktionary_meaning_terms.append(w)
+            try:
+                expansion = semantic_linker.expand_query(resolved_search_terms, global_index.index)
+            except Exception:
+                # Meaning expansion only enriches the exact / synonym stages: if it ever fails, answer without it
+                app.logger.exception('Meaning graph expansion failed; continuing without meaning terms')
+                expansion = {'definitions': [], 'expansions': {}, 'nodes': {}, 'store_hits': 0}
+            meaning_definitions = expansion['definitions']
+            meaning_expansions_by_word = expansion['expansions']
+            meaning_nodes = expansion['nodes']
+            meaning_store_hits = expansion['store_hits']
+            wiktionary_meaning_terms = sorted(meaning_nodes, key=lambda n: (meaning_nodes[n]['cost'], n))
         s3_meaning_time = round((time.time() - s3_meaning_start) * 1000, 3)
 
         # Stage 4: Cross-lingual synonym expansion via Graph BFS
@@ -231,11 +231,11 @@ def search():
         term_weights = {t: 1.0 for t in resolved_search_terms}
         expansion_details = {}
 
-        # Integrate meaning terms into candidate ranking terms with 0.80 weight
+        # Integrate meaning terms into candidate ranking terms; the weight falls with the number of meaning hops
         for mt in wiktionary_meaning_terms:
             if mt in global_index.index and mt not in ranking_terms:
                 ranking_terms.append(mt)
-                term_weights[mt] = 0.80
+                term_weights[mt] = meaning_nodes[mt]['weight']
 
         if use_synonyms:
             # Expand ONLY resolved search terms (DO NOT expand meaning terms into the synonym graph to prevent domain drift!)
@@ -283,15 +283,16 @@ def search():
                 },
                 {
                     'id': 3,
-                    'name': 'Wiktionary Semantic Meaning Lookup',
-                    'dsa': 'In-Memory LRU Cache O(1) + Semantic Gloss Extraction',
-                    'complexity': 'O(1) Cache Hit | O(T) Text Tokenization',
+                    'name': 'Meaning Graph Expansion (Wiktionary)',
+                    'dsa': '0-1 BFS on Meaning Graph (Deque) + In-Memory LRU Cache O(1)',
+                    'complexity': 'O(V_m + E_m) BFS bounded to 2 meaning hops | O(1) Cache Hit',
                     'latency_ms': s3_meaning_time,
-                    'details': f"Extracted meanings for {len(meaning_definitions)} words ({meaning_cache_hits} cache hits); expanded {len(wiktionary_meaning_terms)} same-meaning terms",
+                    'details': f"Resolved meanings for {len(meaning_definitions)} words ({meaning_store_hits} from the learned graph); expanded {len(wiktionary_meaning_terms)} same-meaning terms",
                     'data': {
                         'definitions': meaning_definitions,
                         'meaning_terms': wiktionary_meaning_terms,
                         'expansions': meaning_expansions_by_word,
+                        'paths': {n: ' → '.join(v['path']) for n, v in meaning_nodes.items()},
                         'enabled': use_meaning
                     }
                 },
@@ -379,7 +380,9 @@ def search():
             'doc_length':          global_index.doc_lengths.get(doc_id, 0),
             'matched_by_exact':    matched_by_exact,
             'matched_by_meaning':  matched_by_meaning,
-            'matched_by_synonym':  matched_by_synonym
+            'matched_by_synonym':  matched_by_synonym,
+            # How each meaning match connects back to the query, e.g. "हाथी → elephant → elefante"
+            'meaning_paths':       {t: ' → '.join(meaning_nodes[t]['path']) for t in matched_by_meaning if t in meaning_nodes}
         })
 
         if len(results) >= limit:
@@ -406,7 +409,8 @@ def search():
             'enabled':         use_meaning,
             'definitions':     meaning_definitions,
             'meaning_terms':   wiktionary_meaning_terms,
-            'expansions':      meaning_expansions_by_word
+            'expansions':      meaning_expansions_by_word,
+            'paths':           {n: ' → '.join(v['path']) for n, v in meaning_nodes.items()}
         }
     })
 
@@ -442,7 +446,10 @@ def add_document():
     global_index.add_document(new_id, text, metadata={'title': title, 'lang': lang})
     save_corpus()
 
-    return jsonify({'success': True, 'id': new_id, 'title': title, 'lang': lang})
+    # Link the meaning of the document's words right away so the very next search already reflects it
+    semantic_report = semantic_linker.link_document(title, text, lang, global_index)
+
+    return jsonify({'success': True, 'id': new_id, 'title': title, 'lang': lang, 'semantic_links': semantic_report})
 
 
 @app.route('/delete_document/<doc_id>', methods=['DELETE'])
@@ -538,6 +545,7 @@ def get_stats():
         'engine_version': '3.2-PRO',
         'index': index_stats,
         'graph': graph_stats,
+        'meaning_graph': meaning_graph.get_stats(),
         'cache': cache_stats
     })
 

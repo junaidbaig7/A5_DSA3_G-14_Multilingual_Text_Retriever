@@ -48,9 +48,17 @@ def rank_documents_with_breakdown(query_terms, index, term_weights=None):
                 'contribution': round(contrib, 4)
             })
 
-    # O(R log R) where R is the number of matched documents
-    ranked = sorted(scores.items(), key=lambda item: item[1], reverse=True)
+    # O(R log R) where R is the number of matched documents. Ties are broken by document id: the order in which
+    # documents are first scored follows the order of the query terms, which comes from set iteration and differs
+    # between processes, so without this the top-k of a large tie could change from one run to the next.
+    # Scores are rounded so that float noise from a different summation order cannot split a tie either.
+    ranked = sorted(scores.items(), key=lambda item: (-round(item[1], 9), _doc_order(item[0])))
     return ranked, breakdowns, term_stats
+
+
+def _doc_order(doc_id):
+    """Numeric ids sort numerically and before any non-numeric id."""
+    return (0, int(doc_id), '') if str(doc_id).isdigit() else (1, 0, str(doc_id))
 
 
 def rank_documents(query_terms, index, term_weights=None):

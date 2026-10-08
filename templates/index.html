@@ -49,7 +49,7 @@
 
         <div class="modal-actions">
             <button class="btn-cancel" onclick="closeModal()">Cancel</button>
-            <button class="btn-submit" onclick="submitDoc()">Add Document</button>
+            <button class="btn-submit" id="submitDocBtn" onclick="submitDoc()">Add Document</button>
         </div>
     </div>
 </div>
@@ -239,9 +239,12 @@ async function performSearch(isBrowse = false) {
     latencySpan.textContent = '';
     correctionDiv.style.display = 'none';
 
+    let failedAt = 'request';   // which step threw, so the message can say what actually went wrong
     try {
         const res  = await fetch(`/search?q=${encodeURIComponent(query)}&lang=${lang}&meaning=${useMeaning}`);
+        if (!res.ok) throw new Error(`the server answered HTTP ${res.status}`);
         const data = await res.json();
+        failedAt = 'render';
 
         metaInfo.style.display = 'flex';
         latencySpan.textContent = `⏱ ${data.latency} ms`;
@@ -265,7 +268,7 @@ async function performSearch(isBrowse = false) {
             const termsHtml = (mInfo.meaning_terms && mInfo.meaning_terms.length > 0)
                 ? `<div class="meaning-expansion-pills">
                     <span>Expanded meaning concepts in index:</span>
-                    ${mInfo.meaning_terms.map(t => `<span class="meaning-expansion-pill">${escapeHtml(t)}</span>`).join('')}
+                    ${mInfo.meaning_terms.map(t => `<span class="meaning-expansion-pill" title="${escapeHtml((mInfo.paths || {})[t] || '')}">${escapeHtml(t)}</span>`).join('')}
                    </div>`
                 : '';
 
@@ -300,7 +303,8 @@ async function performSearch(isBrowse = false) {
         resultsContainer.innerHTML = data.results.map(r => {
             let pills = [];
             if (r.matched_by_meaning && r.matched_by_meaning.length > 0) {
-                pills.push(`<span class="match-pill meaning-pill" title="Retrieved via Wiktionary semantic meaning">💡 Matched Meaning: <strong>${escapeHtml(r.matched_by_meaning.join(', '))}</strong></span>`);
+                const meaningLinks = Object.values(r.meaning_paths || {}).map(escapeHtml).join(' | ');
+                pills.push(`<span class="match-pill meaning-pill" title="Linked via meaning: ${meaningLinks || 'Wiktionary semantic meaning'}">💡 Matched Meaning: <strong>${escapeHtml(r.matched_by_meaning.join(', '))}</strong></span>`);
             }
             if (r.matched_by_exact && r.matched_by_exact.length > 0) {
                 pills.push(`<span class="match-pill exact-pill" title="Exact query match">✓ Exact: <strong>${escapeHtml(r.matched_by_exact.join(', '))}</strong></span>`);
@@ -329,7 +333,16 @@ async function performSearch(isBrowse = false) {
             `;
         }).join('');
     } catch (err) {
-        resultsContainer.innerHTML = '<div class="error">An error occurred during search. Please try again.</div>';
+        console.error('Search failed while processing the', failedAt, '-', err);
+        let message;
+        if (failedAt === 'render') {
+            message = `Search failed: the page could not display the results (${escapeHtml(err.message)}).`;
+        } else if (err instanceof TypeError) {   // fetch() rejects with TypeError when the server cannot be reached
+            message = 'Search failed: the search server cannot be reached. Is <code>python app.py</code> running?';
+        } else {
+            message = `Search failed: ${escapeHtml(err.message)}.`;
+        }
+        resultsContainer.innerHTML = `<div class="error">${message}</div>`;
     }
 }
 
@@ -381,6 +394,10 @@ async function submitDoc() {
         return;
     }
 
+    const submitBtn = document.getElementById('submitDocBtn');
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Linking meanings…';    // the new words are looked up and linked before this returns
+
     try {
         const res  = await fetch('/add_document', {
             method: 'POST',
@@ -390,7 +407,11 @@ async function submitDoc() {
         const data = await res.json();
 
         if (data.success) {
-            showToast(`Document "${title}" added (ID: ${data.id}).`, 'success');
+            const sl = data.semantic_links;
+            const linked = sl
+                ? ` · ${sl.terms_linked} word meanings linked` + (sl.terms_pending ? ` (${sl.terms_pending} still resolving)` : '')
+                : '';
+            showToast(`Document "${title}" added (ID: ${data.id})${linked}.`, 'success');
             closeModal();
             // Refresh current view
             const q = document.getElementById('searchInput').value.trim();
@@ -400,6 +421,9 @@ async function submitDoc() {
         }
     } catch {
         showToast('Network error.', 'error');
+    } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Add Document';
     }
 }
 

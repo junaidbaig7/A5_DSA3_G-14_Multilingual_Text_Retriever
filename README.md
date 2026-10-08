@@ -18,6 +18,7 @@ The system is highly modular, breaking down the search pipeline into swappable c
 ### 2. Wiktionary Meaning-Based Semantic Retrieval & LRU Caching
 - **Meaning Search (`modules/wiktionary.py`)**: Seamlessly integrated with Wikimedia's Wiktionary API to search the *meaning* of words. When a user queries a term, the engine extracts definitions, direct glosses, root forms, and thesaurus synonyms, then retrieves all documents in any language that share that same meaning (e.g. searching *automobile* retrieves documents about *cars*; searching *receta* retrieves English *recipes*).
 - **LRU Cache ($O(1)$)**: Employs an in-memory Least Recently Used cache to memoize API responses, ensuring repeat lookups execute in $< 1\text{ ms}$.
+- **Dynamic Meaning Graph (`modules/semantic.py`)**: Documents added at runtime are linked on the spot. When you add a sentence, every content word is resolved through Wiktionary and linked to its lemma (*kittens* — *kitten*) and its translations (*kitten* — *gatito*) in a persistent, undirected graph (`data/semantic_links.json`). Searches expand with a 0-1 BFS over that graph, so *हाथी*, *elephant* and *elefante* find each other regardless of which sentence was added first. A second hop may only pivot on the English headword, which stops polysemous words (Arabic *bustān* = garden **and** orchard) from merging unrelated concepts.
 - **Interactive Meaning UI**: Displays a Wiktionary Meaning Search banner, visual tags indicating why a document was matched (`Matched Meaning: "recipe"`), and a dedicated "Define Word" lookup modal.
 
 ### 3. Adaptability (Swappable Tokenizer)
@@ -32,6 +33,11 @@ The system is highly modular, breaking down the search pipeline into swappable c
 ### 5. Accessibility
 - No external NLP/ML dependencies.
 - Relies only on Flask for the web server, ensuring a single-command setup.
+
+### 6. Verification
+- `python test_semantic_graph.py` — offline tests of the meaning graph (fake dictionary, no network).
+- `python audit_semantic_links.py` — live end-to-end audit: adds fresh multilingual sentences and checks cross-lingual, inflected and late-added matches.
+- `python audit_suite.py` and `python test_pipeline.py` — the existing semantic/DSA audit and pipeline smoke test.
 
 ## How to Run
 

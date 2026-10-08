@@ -31,9 +31,10 @@ The search engine indexes and cross-retrieves documents across 20 languages, par
                         (modules/index.py & modules/matcher.py)
                                        │
                                        ▼
-                [Wiktionary Semantic Meaning Lookup & Expansion]
-                     (modules/wiktionary.py - LRU Cache O(1))
-         Extracts definitions, direct glosses, roots, & thesaurus synonyms
+                [Meaning Graph Expansion (0-1 BFS)]
+          (modules/semantic.py + modules/wiktionary.py - LRU Cache O(1))
+   Links learned when documents were added + the query word resolved live:
+      lemma (cost 0), translations / glosses / synonyms (cost 1)
                                        │
                                        ▼
                     [SynonymGraph (modules/synonyms.py)]
@@ -53,12 +54,13 @@ The search engine indexes and cross-retrieves documents across 20 languages, par
 ### Search Pipeline Steps:
 1. **Tokenization**: Input text is normalized to lowercase and stripped of punctuation while preserving Unicode combining characters (matras, vowel signs, non-Latin scripts).
 2. **Lookup & Fuzzy Correction**: Query tokens are matched against the Inverted Index dictionary. If a word is missing, Levenshtein edit distance (Dynamic Programming) finds the closest vocabulary term within `max_distance=2`.
-3. **Wiktionary Meaning Search & Semantic Expansion**:
-   - Queries the official Wiktionary REST API with in-memory LRU caching.
-   - Extracts semantic headword definitions, direct glosses (e.g. *receta* $\rightarrow$ *recipe*, *agua* $\rightarrow$ *water*), and thesaurus synonyms (e.g. *automobile* $\rightarrow$ *car*, *auto*).
-   - Identifies candidate same-meaning concepts in the corpus index.
+3. **Meaning Graph Expansion (Wiktionary)**:
+   - **On document add** (`POST /add_document`): every content word of the new text is resolved once through Wiktionary (REST definitions + wikitext, LRU-cached) and stored as links in the `MeaningGraph`: inflection → lemma (*kittens* — *kitten*, cost 0), and direct glosses, `{{syn}}` synonyms and `{{t}}`/`{{tt}}` translations (cost 1). The graph persists in `data/semantic_links.json`.
+   - **On search**: the query word is resolved the same way (for this request only, nothing stored) and a **0-1 BFS** finds every indexed word within two meaning hops. A second hop may only pivot on the English headword that both edges hang off (*हाथी* → *elephant* → *elefante* is allowed; *garden* → Arabic *بستان* → *orchard* is refused, because *bustān* means both).
+   - A word the graph positively knows (e.g. *kitten*, the lemma of an indexed *kittens*) is never "corrected" by the typo matcher.
+   - A search first waits (bounded) for any document words still being linked, so a sentence added a moment ago is always reflected.
 4. **Cross-Lingual Query Expansion (Graph BFS)**: Propagates query seeds and verified meaning terms across the 20-language translation graph via Breadth-First Search (BFS).
-5. **Weighted TF-IDF Ranking**: Matched documents are scored with term-weighted TF-IDF (exact query matches: $1.0$, cross-lingual synonyms: $0.85$, Wiktionary meaning terms: $0.80$) and sorted in descending order of relevance.
+5. **Weighted TF-IDF Ranking**: Matched documents are scored with term-weighted TF-IDF (exact query matches: $1.0$, curated cross-lingual synonyms: $0.85$, meaning-graph terms by path cost: inflection $0.95$, one hop $0.80$, two hops $0.65$) and sorted in descending order of relevance.
 6. **Language Filtering & Match Attribution**: Documents are filtered by language selection (`all` or specific code), attributed with match reasons (`matched_by_exact`, `matched_by_meaning`, `matched_by_synonym`), highlighted via `<mark>` tags, and returned to the UI.
 
 ---
@@ -76,6 +78,8 @@ The search engine indexes and cross-retrieves documents across 20 languages, par
 | **Dynamic Programming (Levenshtein Distance)** | [`modules/matcher.py`](file:///e:/Year-2%20Term-1/DSA/project/modules/matcher.py) | 2D matrix dynamic programming to compute minimum edit operations (insertion, deletion, substitution) for typo correction. | $O(m \times n)$ | $O(m \times n)$ |
 | **Linear Search with Length Pruning** | [`modules/matcher.py`](file:///e:/Year-2%20Term-1/DSA/project/modules/matcher.py) | Scans vocabulary for typos, skipping words where $\mid\text{len}(w_1) - \text{len}(w_2)\mid > 2$. | $O(V \times m \times n)$ worst case | $O(1)$ auxiliary |
 | **TF-IDF & Sorting** | [`modules/ranker.py`](file:///e:/Year-2%20Term-1/DSA/project/modules/ranker.py) | Relevancy scoring via $TF \times (\log(N / (1 + df)) + 1)$, followed by descending sort. | Score: $O(Q \times D)$, Sort: $O(R \log R)$ | $O(R)$ |
+| **Graph + 0-1 BFS (Deque)** | [`modules/semantic.py`](file:///e:/Year-2%20Term-1/DSA/project/modules/semantic.py) | Dynamic meaning graph: word → `{neighbour: (cost, hub)}`. Inflection edges cost 0 and go to the front of the deque, meaning edges cost 1 and go to the back, so the deque stays ordered by distance without a priority queue. Bounded to cost 2. | $O(V + E)$ | $O(V)$ |
+| **Thread Pool + Futures** | [`modules/semantic.py`](file:///e:/Year-2%20Term-1/DSA/project/modules/semantic.py) | New document words are resolved in parallel; searches wait on the set of in-flight futures (read-your-writes). | $O(T / W)$ round trips | $O(T)$ |
 | **LRU Cache** | [`modules/wiktionary.py`](file:///e:/Year-2%20Term-1/DSA/project/modules/wiktionary.py) | Hash Map + Doubly-linked order list for memoizing external Wiktionary dictionary lookups with evictions. | $O(1)$ get / put | $O(\text{Capacity})$ |
 | **Sets** | [`modules/synonyms.py`](file:///e:/Year-2%20Term-1/DSA/project/modules/synonyms.py), [`app.py`](file:///e:/Year-2%20Term-1/DSA/project/app.py) | Deduplication of query tokens, visited BFS nodes, and unique posting deletion tokens. | $O(1)$ membership test | $O(U)$ unique items |
 
@@ -90,12 +94,14 @@ project/
 ├── CONTEXT.md              # Project context, architecture & DSA documentation
 ├── README.md               # User guide & project overview
 ├── data/
-│   └── corpus.json         # Persistent JSON document store (106+ multilingual docs)
+│   ├── corpus.json         # Persistent JSON document store (106+ multilingual docs)
+│   └── semantic_links.json # Learned meaning links (generated, git-ignored)
 ├── modules/
 │   ├── __init__.py         # Module initialization
 │   ├── index.py            # InvertedIndex data structure (add, delete, query)
 │   ├── matcher.py          # Levenshtein DP edit distance & fuzzy typo matching
 │   ├── ranker.py           # TF-IDF mathematical relevance scoring & ranking
+│   ├── semantic.py         # Dynamic MeaningGraph (0-1 BFS) + SemanticLinker (links new documents)
 │   ├── synonyms.py         # Cross-lingual SynonymGraph and BFS expansion
 │   ├── tokenizer.py        # Script-safe Unicode tokenizer
 │   ├── trie.py             # TrieNode & Trie prefix tree implementation
@@ -132,7 +138,11 @@ Executes search or browse requests.
       }
     ],
     "latency": 0.85,
-    "corrected_query": null
+    "corrected_query": null,
+    "meaning_info": {
+      "meaning_terms": ["elefante"],
+      "paths": { "elefante": "हाथी → elephant → elefante" }
+    }
   }
   ```
 
@@ -152,9 +162,14 @@ Appends a new document to the in-memory inverted index and persists it to `data/
     "success": true,
     "id": "107",
     "title": "Masala Dosa Recipe",
-    "lang": "kn"
+    "lang": "kn",
+    "semantic_links": {
+      "terms_attempted": 6, "terms_linked": 6, "terms_pending": 0,
+      "terms_failed": 0, "edges_added": 41
+    }
   }
   ```
+  Meanings of the new words are linked before the response (up to 10 s; slower words keep resolving in the background and any search waits for them).
 
 ### 4. `DELETE /delete_document/<doc_id>`
 Deletes a document from the in-memory index, cleans inverted posting lists, and persists the removal to disk.
